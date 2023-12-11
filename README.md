@@ -1,29 +1,33 @@
-# @node-libraries/wasm-webp-encoder
-
-# Overview
-
-Provides the ability to encode WebP using WebAssembly and WebWorker.  
-Up to 4 parallel threads.
-
-# types
-
-```ts
-encode(data: BufferSource, width: number, height: number, quality?: number): Promise<Uint8Array | null>
-```
-
-```ts
-encode(data: ImageData, quality?: number): Promise<Uint8Array | null>
-```
+# wasm-image-optimization
 
 # usage
 
 ```ts
-import { encode } from '@node-libraries/wasm-webp-encoder';
+import { optimizeImage } from 'wasm-image-optimization';
 
-const encodedValue = await encode(ctx.getImageData(0, 0, img.width, img.height));
-const encodedValue2 = await encode(arrayBuffer, width, height);
+export interface Env {}
+
+const handleRequest = async (
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext
+): Promise<Response> => {
+  const srcImage = await fetch(
+    'https://raw.githubusercontent.com/SoraKumo001/zenn/master/images/0d107b03c58104/2022-04-14-17-03-07.png'
+  ).then((res) => res.arrayBuffer());
+  const image = await optimizeImage({
+    image: srcImage,
+    width: 200,
+    height: 200,
+  });
+  return new Response(image, {
+    headers: {
+      'Content-Type': 'image/webp',
+    },
+  });
+};
+
+export default {
+  fetch: handleRequest,
+};
 ```
-
-# Sample when used with Next.js
-
-- https://github.com/SoraKumo001/next-webp
