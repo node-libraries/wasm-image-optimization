@@ -1,31 +1,45 @@
 {
   "name": "wasm-image-optimization",
   "description": "Optimize images with wasm on edge runtime",
-  "version": "0.0.5",
-  "main": "./dist/cjs/index.js",
-  "types": "./dist/cjs/index.d.ts",
+  "version": "0.0.6",
   "exports": {
-    ".": {
-      "import": "./dist/cjs/index.js",
-      "types": "./dist/cjs/index.d.ts"
-    },
     "./edge": {
-      "import": "./dist/esm/index.js",
-      "types": "./dist/esm/index.d.ts"
+      "default": {
+        "default": "./dist/esm/index.js",
+        "types": "./dist/esm/index.d.ts"
+      }
+    },
+    "./node": {
+      "default": {
+        "default": "./dist/cjs/index.js",
+        "types": "./dist/cjs/index.d.ts"
+      }
+    },
+    ".": {
+      "default": {
+        "default": "./dist/workers/index.js",
+        "types": "./dist/workers/index.d.ts"
+      }
     }
   },
   "typesVersions": {
     "*": {
-      "*": [
+      "edge": [
+        "./dist/esm/index.d.ts"
+      ],
+      "node": [
         "./dist/cjs/index.d.ts"
+      ],
+      "*": [
+        "./dist/workers/index.d.ts"
       ]
     }
   },
   "license": "MIT",
   "scripts": {
     "test": "yarn tsc -b test && node test",
-    "build": "tsc && tsc -p ./tsconfig.esm.json && cpy esm dist",
-    "build:wasm": "cpy --cwd=src *.d.ts ../../dist && bash -c make ",
+    "build": "tsc && tsc -p ./tsconfig.csj.json && cpy esm dist",
+    "build:wasm": "make -j",
     "lint:fix": "eslint --fix src/ && prettier -w src",
     "clone:webp": "git clone https://github.com/webmproject/libwebp"
   },

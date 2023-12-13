@@ -1,9 +1,10 @@
-import LibImage from '../workers/libImage';
-import path from 'path';
-import fs from 'fs';
+import LibImage from './libImage.js';
+import WASM from '../esm/libImage.wasm';
 
 const libImage = LibImage({
-  wasmBinary: fs.readFileSync(path.resolve(__dirname, '../esm/libImage.wasm')),
+  instantiateWasm: async (imports, receiver) => {
+    receiver(await WebAssembly.instantiate(WASM, imports));
+  },
 });
 
 export const optimizeImage = async ({

@@ -1,5 +1,14 @@
 # wasm-image-optimization
 
+- Cloudflare workers  
+  `import { optimizeImage } from 'wasm-image-optimization';`
+- Edge runtime  
+  `import { optimizeImage } from 'wasm-image-optimization/edge';`
+- Node runtime  
+  `import { optimizeImage } from 'wasm-image-optimization/node';`
+
+- function
+
 ```ts
 // quality: 1-100
 optimizeImage({image: ArrayBuffer, width?: number, height?:number,quality?: number}): Promise<ArrayBuffer>

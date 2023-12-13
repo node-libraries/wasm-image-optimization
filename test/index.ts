@@ -1,4 +1,4 @@
-import { optimizeImage } from '../dist/cjs/index.js';
+import { optimizeImage } from '../dist/cjs';
 import fs from 'node:fs';
 
 const main = async () => {

@@ -14,8 +14,8 @@ val optimize(std::string img_in, float width, float height, float quality) {
     }
     
     SDL_Surface* srcSurface = IMG_Load_RW(rw, 1);
+    SDL_FreeRW(rw);
     if (!srcSurface) {
-        SDL_FreeRW(rw);
         return val::null();
     }
     
@@ -44,7 +44,6 @@ val optimize(std::string img_in, float width, float height, float quality) {
     }
 
     SDL_BlitScaled(srcSurface, nullptr, newSurface, nullptr);
-
     SDL_FreeSurface(srcSurface);
 
     uint8_t* img_out = nullptr;
