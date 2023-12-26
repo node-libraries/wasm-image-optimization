@@ -10,7 +10,7 @@ esm: src/libImage.cpp
     -I libavif/include -I libavif/third_party/libyuv/include \
     libavif/src/{alpha,avif,colr,colrconvert,diag,exif,io,mem,obu,rawdata,read,reformat,reformat_libsharpyuv,reformat_libyuv,scale,stream,utils,write,codec_aom}.c \
     libavif/third_party/libyuv/source/{scale,scale_common,scale_any,row_common,planar_functions}.c \
-    -I libavif/ext/aom -DAVIF_CODEC_AOM_DECODE -DAVIF_CODEC_AOM_ENCODE libavif/ext/aom_build/libaom.a \
+    -I libavif/ext/aom -DAVIF_CODEC_AOM_DECODE libavif/ext/aom_build/libaom.a \
     -o dist/esm/$(basename $(<F)).js $< 
     
 workers: src/libImage.cpp
@@ -23,6 +23,6 @@ workers: src/libImage.cpp
     -I libavif/include -I libavif/third_party/libyuv/include \
     libavif/src/{alpha,avif,colr,colrconvert,diag,exif,io,mem,obu,rawdata,read,reformat,reformat_libsharpyuv,reformat_libyuv,scale,stream,utils,write,codec_aom}.c \
     libavif/third_party/libyuv/source/{scale,scale_common,scale_any,row_common,planar_functions}.c \
-    -I libavif/ext/aom -DAVIF_CODEC_AOM_DECODE -DAVIF_CODEC_AOM_ENCODE libavif/ext/aom_build/libaom.a \
+    -I libavif/ext/aom -DAVIF_CODEC_AOM_DECODE libavif/ext/aom_build/libaom.a \
     -o dist/workers/$(basename $(<F)).js $< 
 	rm dist/workers/$(basename $(<F)).wasm
