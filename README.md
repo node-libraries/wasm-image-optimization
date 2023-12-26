@@ -19,6 +19,7 @@ optimizeImage({image: ArrayBuffer, width?: number, height?:number,quality?: numb
   - png
   - webp
   - svg
+  - avif
 - output format
   - webp
 

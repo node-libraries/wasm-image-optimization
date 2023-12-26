@@ -2,6 +2,7 @@
 /src
 /test
 /libwebp
+/libavif
 tsconfig.json
 tsconfig.csj.json
 yarn.lock
@@ -12,3 +13,4 @@ Makefile
 typings.d.ts
 /esm
 /images
+/image_output
