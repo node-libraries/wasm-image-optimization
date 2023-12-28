@@ -11,7 +11,7 @@
 
 ```ts
 // quality: 1-100
-optimizeImage({image: ArrayBuffer, width?: number, height?:number,quality?: number}): Promise<ArrayBuffer>
+optimizeImage({image: ArrayBuffer, width?: number, height?:number,quality?: number,format?: "png" | "jpeg" | "webp"}): Promise<ArrayBuffer>
 ```
 
 - source format
@@ -21,7 +21,9 @@ optimizeImage({image: ArrayBuffer, width?: number, height?:number,quality?: numb
   - svg
   - avif
 - output format
-  - webp
+  - jpeg
+  - png
+  - webp(default)
 
 # usage
 
