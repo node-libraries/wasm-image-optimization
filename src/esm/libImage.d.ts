@@ -3,7 +3,8 @@ export declare type ModuleType = {
     data: BufferSource,
     width: number,
     height: number,
-    quality: number
+    quality: number,
+    format: 'jpeg' | 'png' | 'webp'
   ) => Uint8Array | null;
 };
 

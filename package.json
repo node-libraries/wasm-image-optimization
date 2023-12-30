@@ -1,7 +1,7 @@
 {
   "name": "wasm-image-optimization",
   "description": "Optimize images with wasm on edge runtime",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "exports": {
     "./edge": {
       "default": {
@@ -44,7 +44,7 @@
     "clone:lib": "git clone https://github.com/webmproject/libwebp && git clone https://github.com/AOMediaCodec/libavif"
   },
   "devDependencies": {
-    "@types/node": "^20.10.5",
+    "@types/node": "^20.10.6",
     "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.16.0",
     "cpy-cli": "^5.0.0",
