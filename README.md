@@ -2,9 +2,11 @@
 
 - Cloudflare workers  
   `import { optimizeImage } from 'wasm-image-optimization';`
-- Edge runtime (Import here if using from Next.js)  
-  `import { optimizeImage } from 'wasm-image-optimization/edge';`
-- Node runtime (CJS)
+- Next.js(Webpack)  
+  `import { optimizeImage } from 'wasm-image-optimization/next';`
+- ESM(import base)  
+  `import { optimizeImage } from 'wasm-image-optimization/esm';`
+- CJS(file base)
   `import { optimizeImage } from 'wasm-image-optimization/node';`
 
 - function

@@ -3,5 +3,5 @@
   "compilerOptions": {
     "module": "CommonJS"
   },
-  "exclude": ["node_modules", "dist", "test", "src/workers", "src/esm/", "libavif", "libwebp"]
+  "exclude": ["node_modules", "dist", "test", "src/workers", "src/next", "src/esm/"]
 }

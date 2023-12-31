@@ -1,5 +1,5 @@
-import LibImage from './libImage.js';
-import WASM from '../esm/libImage.wasm';
+import LibImage from '../workers//libImage.js';
+import WASM from '../esm/libImage.wasm?module';
 
 const libImage = LibImage({
   instantiateWasm: async (imports, receiver) => {

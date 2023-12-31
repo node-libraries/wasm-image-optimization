@@ -1,12 +1,18 @@
 {
   "name": "wasm-image-optimization",
   "description": "Optimize images with wasm on edge runtime",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "exports": {
-    "./edge": {
+    "./esm": {
       "default": {
         "import": "./dist/esm/index.js",
         "types": "./dist/esm/index.d.ts"
+      }
+    },
+    "./next": {
+      "default": {
+        "import": "./dist/next/index.js",
+        "types": "./dist/next/index.d.ts"
       }
     },
     "./node": {
@@ -26,6 +32,9 @@
     "*": {
       "edge": [
         "./dist/esm/index.d.ts"
+      ],
+      "next": [
+        "./dist/next/index.d.ts"
       ],
       "node": [
         "./dist/cjs/index.d.ts"
