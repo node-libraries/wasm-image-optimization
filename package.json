@@ -11,14 +11,14 @@
     },
     "./node": {
       "default": {
-        "default": "./dist/cjs/index.js",
-        "types": "./dist/cjs/index.d.ts"
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
       }
     },
     ".": {
       "default": {
-        "default": "./dist/workers/index.js",
-        "types": "./dist/workers/index.d.ts"
+        "types": "./dist/workers/index.d.ts",
+        "default": "./dist/workers/index.js"
       }
     }
   },
