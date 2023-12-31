@@ -6,7 +6,7 @@ TARGET_WORKERS = dist/workers/$(basename $(notdir src/libImage.cpp)).js
 
 CFLAGS = -O3 --bind -msimd128 \
   -Ilibwebp -Ilibwebp/src -Ilibavif/include -Ilibavif/third_party/libyuv/include -Ilibavif/ext/aom \
-  -s ASSERTIONS=1 -DAVIF_CODEC_AOM_DECODE -DAVIF_CODEC_AOM=LOCAL
+  -DAVIF_CODEC_AOM_DECODE -DAVIF_CODEC_AOM=LOCAL
 
 WEBP_SOURCES := $(wildcard libwebp/src/dsp/*.c) \
                 $(wildcard libwebp/src/enc/*.c) \
