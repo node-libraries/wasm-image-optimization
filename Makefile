@@ -1,20 +1,28 @@
 SHELL=/bin/bash
 WORKDIR=work
+DISTDIR=dist
+ESMDIR=$(DISTDIR)/esm
+WORKERSDIR=$(DISTDIR)/workers
+LIBDIR=libavif/ext
 
-TARGET_ESM = dist/esm/$(basename $(notdir src/libImage.cpp)).js
-TARGET_WORKERS = dist/workers/$(basename $(notdir src/libImage.cpp)).js
+TARGET_ESM_BASE = $(notdir $(basename src/libImage.cpp))
+TARGET_ESM = $(ESMDIR)/$(TARGET_ESM_BASE).js
+TARGET_WORKERS = $(WORKERSDIR)/$(TARGET_ESM_BASE).js
 
-CFLAGS = -O3 --bind -msimd128 \
-  -Ilibwebp -Ilibwebp/src -Ilibavif/include -Ilibavif/third_party/libyuv/include -Ilibavif/ext/aom \
-  -DAVIF_CODEC_AOM_DECODE -DAVIF_CODEC_AOM=LOCAL
+CFLAGS = -O3 -msimd128 \
+        -Ilibwebp -Ilibwebp/src -Ilibavif/include -Ilibavif/third_party/libyuv/include -Ilibavif/ext/aom \
+        -DAVIF_CODEC_AOM_DECODE -DAVIF_CODEC_AOM=LOCAL
+
+CFLAGS_ASM = --bind \
+             -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s ENVIRONMENT=web -s DYNAMIC_EXECUTION=0 -s MODULARIZE=1 \
+             -s USE_SDL=2 -s USE_SDL_IMAGE=2 \
+             -s SDL2_IMAGE_FORMATS='["png","jpg","webp","svg","avif"]'
 
 WEBP_SOURCES := $(wildcard libwebp/src/dsp/*.c) \
                 $(wildcard libwebp/src/enc/*.c) \
                 $(wildcard libwebp/src/utils/*.c) \
                 $(wildcard libwebp/src/dec/*.c) \
                 $(wildcard libwebp/sharpyuv/*.c)
-WEBP_OBJECTS := $(patsubst %.c, %.o, $(WEBP_SOURCES))
-
 AVIF_SOURCES := libavif/src/alpha.c \
                 libavif/src/avif.c \
                 libavif/src/colr.c \
@@ -39,11 +47,31 @@ AVIF_SOURCES := libavif/src/alpha.c \
                 libavif/third_party/libyuv/source/scale_any.c \
                 libavif/third_party/libyuv/source/row_common.c \
                 libavif/third_party/libyuv/source/planar_functions.c
-AVIF_OBJECTS := $(patsubst %.c, %.o, $(AVIF_SOURCES))
+WEBP_OBJECTS := $(WEBP_SOURCES:.c=.o)
+AVIF_OBJECTS := $(AVIF_SOURCES:.c=.o)
 
-.PHONY: all esm workers
+.PHONY: all esm workers clean
 
 all: esm workers
+
+$(WEBP_OBJECTS) $(AVIF_OBJECTS): %.o: %.c | $(LIBDIR)/aom_build/libaom.a
+	emcc $(CFLAGS) -c $< -o $@
+
+$(LIBDIR)/aom_build/libaom.a:
+	@echo Building aom...
+	@cd $(LIBDIR) && ./aom.cmd && mkdir aom_build && cd aom_build && \
+	emcmake cmake ../aom \
+    -DENABLE_CCACHE=1 \
+    -DAOM_TARGET_CPU=generic \
+    -DENABLE_DOCS=0 \
+    -DENABLE_TESTS=0 \
+    -DCONFIG_ACCOUNTING=1 \
+    -DCONFIG_INSPECTION=1 \
+    -DCONFIG_MULTITHREAD=0 \
+    -DCONFIG_RUNTIME_CPU_DETECT=0 \
+    -DCONFIG_WEBM_IO=0 \
+    -DCMAKE_BUILD_TYPE=Release && \
+	make aom
 
 $(WORKDIR):
 	mkdir -p $(WORKDIR)
@@ -54,33 +82,22 @@ $(WORKDIR)/webp.a: $(WORKDIR) $(WEBP_OBJECTS)
 $(WORKDIR)/avif.a: $(WORKDIR) $(AVIF_OBJECTS)
 	emar rcs $@ $(AVIF_OBJECTS)
 
-%.o: %.c
-	emcc ${CFLAGS} -c $< -o $@
+$(ESMDIR) $(WORKERSDIR):
+	@mkdir -p $@
 
 esm: $(TARGET_ESM)
 
-$(TARGET_ESM): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a libavif/ext/aom_build/libaom.a
-	mkdir -p dist/esm
-	emcc $(CFLAGS) \
-	-s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s ENVIRONMENT=web -s DYNAMIC_EXECUTION=0 -s MODULARIZE=1 -s EXPORT_ES6=1 \
-	-s USE_SDL=2 -s USE_SDL_IMAGE=2 \
-	-s SDL2_IMAGE_FORMATS='["png","jpg","webp","svg","avif"]' \
-	-o $(TARGET_ESM) \
-	$^
+$(TARGET_ESM): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(LIBDIR)/aom_build/libaom.a | $(ESMDIR)
+	emcc $(CFLAGS) -o $@ $^ \
+       $(CFLAGS_ASM)  -s EXPORT_ES6=1
 
 workers: $(TARGET_WORKERS)
 
-$(TARGET_WORKERS): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a libavif/ext/aom_build/libaom.a
-	mkdir -p dist/workers
-	emcc $(CFLAGS) \
-	-s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s ENVIRONMENT=web -s DYNAMIC_EXECUTION=0 -s MODULARIZE=1 \
-	-s USE_SDL=2 -s USE_SDL_IMAGE=2 \
-	-s SDL2_IMAGE_FORMATS='["png","jpg","webp","svg","avif"]' \
-	-o $(TARGET_WORKERS) \
-	$^
-	rm dist/workers/libImage.wasm
+$(TARGET_WORKERS): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(LIBDIR)/aom_build/libaom.a | $(WORKERSDIR)
+	emcc $(CFLAGS) -o $@ $^ \
+       $(CFLAGS_ASM)
+	@rm $(WORKERSDIR)/$(TARGET_ESM_BASE).wasm
 
 clean:
-	rm -rf $(WORKDIR)
-	rm -rf dist/workers/libImage.*
-	rm -rf dist/esm/libImage.*
+	@echo Cleaning up...
+	@rm -rf $(WORKDIR) $(LIBDIR)/aom_build $(DISTDIR)/esm $(DISTDIR)/workers
