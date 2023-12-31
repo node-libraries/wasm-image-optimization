@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+  emcc:
+    container_name: wasm-image-optimization
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - app:/app
+      - cache:/emsdk/upstream/emscripten/cache
+      - ../Makefile:/app/Makefile
+      - ../src:/app/src
+      - ../dist:/app/dist
+volumes:
+  app:
+  cache:

@@ -38,10 +38,10 @@
   "license": "MIT",
   "scripts": {
     "test": "yarn ts-node test",
-    "build": "tsc && tsc -p ./tsconfig.csj.json && cpy esm dist",
-    "build:wasm": "make -j",
     "lint:fix": "eslint --fix src/ && prettier -w src",
-    "clone:lib": "git clone https://github.com/webmproject/libwebp && git clone https://github.com/AOMediaCodec/libavif"
+    "build": "tsc && tsc -p ./tsconfig.csj.json && cpy esm dist",
+    "build:wasm": "docker compose -f docker/docker-compose.yml run emcc make -j",
+    "docker:shell": "docker compose -f docker/docker-compose.yml run emcc bash -l"
   },
   "devDependencies": {
     "@types/node": "^20.10.6",
