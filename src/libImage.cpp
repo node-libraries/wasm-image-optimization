@@ -52,23 +52,17 @@ private:
 int getOrientation(std::string img)
 {
     int orientation = 1;
-    try
+    ExifData *ed = exif_data_new_from_data((const unsigned char *)img.c_str(), img.size());
+    if (!ed)
     {
-        ExifData *ed = exif_data_new_from_data((const unsigned char *)img.c_str(), img.size());
-        if (!ed)
-        {
-            return orientation;
-        }
-        ExifEntry *entry = exif_content_get_entry(ed->ifd[EXIF_IFD_0], EXIF_TAG_ORIENTATION);
-        if (entry)
-        {
-            orientation = exif_get_short(entry->data, exif_data_get_byte_order(entry->parent->parent));
-        }
-        exif_data_unref(ed);
+        return orientation;
     }
-    catch (...)
+    ExifEntry *entry = exif_content_get_entry(ed->ifd[EXIF_IFD_0], EXIF_TAG_ORIENTATION);
+    if (entry)
     {
+        orientation = exif_get_short(entry->data, exif_data_get_byte_order(entry->parent->parent));
     }
+    exif_data_unref(ed);
     return orientation;
 }
 
@@ -111,24 +105,16 @@ val optimize(std::string img_in, float width, float height, float quality, std::
         outWidth = outHeight * aspectSrc;
     }
 
-    if (orientation >= 5 && orientation <= 8)
-    {
-        int tmp = outWidth;
-        outWidth = outHeight;
-        outHeight = tmp;
-    }
-
     SDL_Surface *newSurface = SDL_CreateRGBSurfaceWithFormat(0, static_cast<int>(outWidth), static_cast<int>(outHeight), 32, SDL_PIXELFORMAT_RGBA32);
     if (!newSurface)
     {
         SDL_FreeSurface(srcSurface);
         return val::null();
     }
-    if (orientation == 1)
-    {
-        SDL_BlitScaled(srcSurface, nullptr, newSurface, nullptr);
-    }
-    else
+    SDL_BlitScaled(srcSurface, nullptr, newSurface, nullptr);
+    SDL_FreeSurface(srcSurface);
+
+    if (orientation > 1)
     {
         double angle = 0;
         double x = 1;
@@ -159,11 +145,10 @@ val optimize(std::string img_in, float width, float height, float quality, std::
             angle = 90.0;
             break;
         }
-        SDL_Surface *rotatedSurface = rotozoomSurfaceXY(srcSurface, angle, x, y, SMOOTHING_ON);
-        SDL_BlitScaled(rotatedSurface, nullptr, newSurface, nullptr);
-        SDL_FreeSurface(rotatedSurface);
+        SDL_Surface *rotatedSurface = rotozoomSurfaceXY(newSurface, angle, x, y, SMOOTHING_ON);
+        SDL_FreeSurface(newSurface);
+        newSurface = rotatedSurface;
     }
-    SDL_FreeSurface(srcSurface);
 
     if (format == "png" || format == "jpeg")
     {
@@ -188,8 +173,10 @@ val optimize(std::string img_in, float width, float height, float quality, std::
     {
         uint8_t *img_out;
         val result = val::null();
-        int stride = static_cast<int>(outWidth) * 4;
-        size_t size = WebPEncodeRGBA(reinterpret_cast<uint8_t *>(newSurface->pixels), static_cast<int>(outWidth), static_cast<int>(outHeight), stride, quality, &img_out);
+        int width = newSurface->w;
+        int height = newSurface->h;
+        int stride = width * 4;
+        size_t size = WebPEncodeRGBA(reinterpret_cast<uint8_t *>(newSurface->pixels), width, height, stride, quality, &img_out);
         if (size > 0 && img_out)
         {
             result = val::global("Uint8Array").new_(typed_memory_view(size, img_out));
