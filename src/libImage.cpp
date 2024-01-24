@@ -2,8 +2,10 @@
 #include <emscripten/bind.h>
 #include <emscripten/val.h>
 #include <webp/encode.h>
-#include <SDL_image.h>
+#include <SDL2/SDL2_rotozoom.h>
+#include <SDL2/SDL_image.h>
 #include <SDL2/SDL.h>
+#include <libexif/exif-data.h>
 
 using namespace emscripten;
 
@@ -47,8 +49,27 @@ private:
     std::vector<uint8_t> m_buffer;
 };
 
+int getOrientation(std::string img)
+{
+    int orientation = 1;
+    ExifData *ed = exif_data_new_from_data((const unsigned char *)img.c_str(), img.size());
+    if (!ed)
+    {
+        return orientation;
+    }
+    ExifEntry *entry = exif_content_get_entry(ed->ifd[EXIF_IFD_0], EXIF_TAG_ORIENTATION);
+    if (entry)
+    {
+        orientation = exif_get_short(entry->data, exif_data_get_byte_order(entry->parent->parent));
+    }
+    exif_data_unref(ed);
+    return orientation;
+}
+
 val optimize(std::string img_in, float width, float height, float quality, std::string format)
 {
+    int orientation = getOrientation(img_in);
+
     SDL_RWops *rw = SDL_RWFromConstMem(img_in.c_str(), img_in.size());
     if (!rw)
     {
@@ -84,14 +105,58 @@ val optimize(std::string img_in, float width, float height, float quality, std::
         outWidth = outHeight * aspectSrc;
     }
 
+    if (orientation >= 5 && orientation <= 8)
+    {
+        int tmp = outWidth;
+        outWidth = outHeight;
+        outHeight = tmp;
+    }
+
     SDL_Surface *newSurface = SDL_CreateRGBSurfaceWithFormat(0, static_cast<int>(outWidth), static_cast<int>(outHeight), 32, SDL_PIXELFORMAT_RGBA32);
     if (!newSurface)
     {
         SDL_FreeSurface(srcSurface);
         return val::null();
     }
-
-    SDL_BlitScaled(srcSurface, nullptr, newSurface, nullptr);
+    if (orientation == 1)
+    {
+        SDL_BlitScaled(srcSurface, nullptr, newSurface, nullptr);
+    }
+    else
+    {
+        double angle = 0;
+        double x = 1;
+        double y = 1;
+        switch (orientation)
+        {
+        case 2:
+            x = -1.0;
+            break;
+        case 3:
+            angle = 180.0;
+            break;
+        case 4:
+            y = -1.0;
+            break;
+        case 5:
+            angle = 90.0;
+            x = -1.0;
+            break;
+        case 6:
+            angle = 270.0;
+            break;
+        case 7:
+            angle = 270.0;
+            x = -1.0;
+            break;
+        case 8:
+            angle = 90.0;
+            break;
+        }
+        SDL_Surface *rotatedSurface = rotozoomSurfaceXY(srcSurface, angle, x, y, SMOOTHING_ON);
+        SDL_BlitScaled(rotatedSurface, nullptr, newSurface, nullptr);
+        SDL_FreeSurface(rotatedSurface);
+    }
     SDL_FreeSurface(srcSurface);
 
     if (format == "png" || format == "jpeg")

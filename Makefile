@@ -11,11 +11,12 @@ TARGET_WORKERS = $(WORKERSDIR)/$(TARGET_ESM_BASE).js
 
 CFLAGS = -O3 -msimd128 \
         -Ilibwebp -Ilibwebp/src -Ilibavif/include -Ilibavif/third_party/libyuv/include -Ilibavif/ext/aom \
+        -Ilibexif \
         -DAVIF_CODEC_AOM_DECODE -DAVIF_CODEC_AOM=LOCAL
 
 CFLAGS_ASM = --bind \
              -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s ENVIRONMENT=web -s DYNAMIC_EXECUTION=0 -s MODULARIZE=1 \
-             -s USE_SDL=2 -s USE_SDL_IMAGE=2 \
+             -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_GFX=2 \
              -s SDL2_IMAGE_FORMATS='["png","jpg","webp","svg","avif"]'
 
 WEBP_SOURCES := $(wildcard libwebp/src/dsp/*.c) \
@@ -47,20 +48,28 @@ AVIF_SOURCES := libavif/src/alpha.c \
                 libavif/third_party/libyuv/source/scale_any.c \
                 libavif/third_party/libyuv/source/row_common.c \
                 libavif/third_party/libyuv/source/planar_functions.c
+
+EXIF_SOURCES := $(wildcard libexif/libexif/*.c) \
+                $(wildcard libexif/libexif/canon/*.c) \
+                $(wildcard libexif/libexif/fuji/*.c) \
+                $(wildcard libexif/libexif/olympus/*.c) \
+                $(wildcard libexif/libexif/pentax/*.c) 
+
 WEBP_OBJECTS := $(WEBP_SOURCES:.c=.o)
 AVIF_OBJECTS := $(AVIF_SOURCES:.c=.o)
+EXIF_OBJECTS := $(EXIF_SOURCES:.c=.o)
 
 .PHONY: all esm workers clean
 
 all: esm workers
 
 $(WEBP_OBJECTS) $(AVIF_OBJECTS): %.o: %.c | $(LIBDIR)/aom_build/libaom.a
-	emcc $(CFLAGS) -c $< -o $@
+	@emcc $(CFLAGS) -c $< -o $@
 
 $(LIBDIR)/aom_build/libaom.a:
 	@echo Building aom...
 	@cd $(LIBDIR) && ./aom.cmd && mkdir aom_build && cd aom_build && \
-	emcmake cmake ../aom \
+	@emcmake cmake ../aom \
     -DENABLE_CCACHE=1 \
     -DAOM_TARGET_CPU=generic \
     -DENABLE_DOCS=0 \
@@ -71,29 +80,33 @@ $(LIBDIR)/aom_build/libaom.a:
     -DCONFIG_RUNTIME_CPU_DETECT=0 \
     -DCONFIG_WEBM_IO=0 \
     -DCMAKE_BUILD_TYPE=Release && \
-	make aom
+	@make aom
 
 $(WORKDIR):
-	mkdir -p $(WORKDIR)
+	@mkdir -p $(WORKDIR)
 
 $(WORKDIR)/webp.a: $(WORKDIR) $(WEBP_OBJECTS)
-	emar rcs $@ $(WEBP_OBJECTS)
+	@emar rcs $@ $(WEBP_OBJECTS)
 
 $(WORKDIR)/avif.a: $(WORKDIR) $(AVIF_OBJECTS)
-	emar rcs $@ $(AVIF_OBJECTS)
+	@emar rcs $@ $(AVIF_OBJECTS)
+
+$(WORKDIR)/libexif.a: $(EXIF_SOURCES)
+	@cd libexif && autoreconf -i && emconfigure ./configure && cd libexif && emmake make
+	@emar rcs $@ $(EXIF_OBJECTS)
 
 $(ESMDIR) $(WORKERSDIR):
 	@mkdir -p $@
 
 esm: $(TARGET_ESM)
 
-$(TARGET_ESM): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(LIBDIR)/aom_build/libaom.a | $(ESMDIR)
+$(TARGET_ESM): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(WORKDIR)/libexif.a $(LIBDIR)/aom_build/libaom.a | $(ESMDIR)
 	emcc $(CFLAGS) -o $@ $^ \
        $(CFLAGS_ASM)  -s EXPORT_ES6=1
 
 workers: $(TARGET_WORKERS)
 
-$(TARGET_WORKERS): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(LIBDIR)/aom_build/libaom.a | $(WORKERSDIR)
+$(TARGET_WORKERS): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(WORKDIR)/libexif.a $(LIBDIR)/aom_build/libaom.a | $(WORKERSDIR)
 	emcc $(CFLAGS) -o $@ $^ \
        $(CFLAGS_ASM)
 	@rm $(WORKERSDIR)/$(TARGET_ESM_BASE).wasm

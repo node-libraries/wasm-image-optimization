@@ -17,7 +17,7 @@ optimizeImage({image: ArrayBuffer, width?: number, height?:number,quality?: numb
 ```
 
 - source format
-  - jpeg
+  - jpeg(EXIF orientation is supported)
   - png
   - webp
   - svg

@@ -1,7 +1,7 @@
 {
   "name": "wasm-image-optimization",
   "description": "Optimize images with wasm on edge runtime",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "exports": {
     "./esm": {
       "default": {
