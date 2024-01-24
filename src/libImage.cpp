@@ -52,17 +52,23 @@ private:
 int getOrientation(std::string img)
 {
     int orientation = 1;
-    ExifData *ed = exif_data_new_from_data((const unsigned char *)img.c_str(), img.size());
-    if (!ed)
+    try
     {
-        return orientation;
+        ExifData *ed = exif_data_new_from_data((const unsigned char *)img.c_str(), img.size());
+        if (!ed)
+        {
+            return orientation;
+        }
+        ExifEntry *entry = exif_content_get_entry(ed->ifd[EXIF_IFD_0], EXIF_TAG_ORIENTATION);
+        if (entry)
+        {
+            orientation = exif_get_short(entry->data, exif_data_get_byte_order(entry->parent->parent));
+        }
+        exif_data_unref(ed);
     }
-    ExifEntry *entry = exif_content_get_entry(ed->ifd[EXIF_IFD_0], EXIF_TAG_ORIENTATION);
-    if (entry)
+    catch (...)
     {
-        orientation = exif_get_short(entry->data, exif_data_get_byte_order(entry->parent->parent));
     }
-    exif_data_unref(ed);
     return orientation;
 }
 
