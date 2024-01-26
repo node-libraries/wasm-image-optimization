@@ -53,7 +53,7 @@
     "docker:shell": "docker compose -f docker/docker-compose.yml run emcc bash -l"
   },
   "devDependencies": {
-    "@types/node": "^20.11.6",
+    "@types/node": "^20.11.7",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
     "cpy-cli": "^5.0.0",

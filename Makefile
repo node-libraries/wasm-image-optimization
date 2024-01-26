@@ -69,7 +69,7 @@ $(WEBP_OBJECTS) $(AVIF_OBJECTS): %.o: %.c | $(LIBDIR)/aom_build/libaom.a
 $(LIBDIR)/aom_build/libaom.a:
 	@echo Building aom...
 	@cd $(LIBDIR) && ./aom.cmd && mkdir aom_build && cd aom_build && \
-	@emcmake cmake ../aom \
+	emcmake cmake ../aom \
     -DENABLE_CCACHE=1 \
     -DAOM_TARGET_CPU=generic \
     -DENABLE_DOCS=0 \
@@ -80,7 +80,7 @@ $(LIBDIR)/aom_build/libaom.a:
     -DCONFIG_RUNTIME_CPU_DETECT=0 \
     -DCONFIG_WEBM_IO=0 \
     -DCMAKE_BUILD_TYPE=Release && \
-	@make aom
+	make aom
 
 $(WORKDIR):
 	@mkdir -p $(WORKDIR)
