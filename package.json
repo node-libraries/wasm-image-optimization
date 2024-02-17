@@ -1,7 +1,7 @@
 {
   "name": "wasm-image-optimization",
   "description": "Optimize images with wasm on edge runtime",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "exports": {
     "./esm": {
       "default": {
@@ -49,17 +49,17 @@
     "test": "yarn ts-node test",
     "lint:fix": "eslint --fix src/ && prettier -w src",
     "build": "tsc && tsc -p ./tsconfig.csj.json && cpy esm dist",
-    "build:wasm": "docker compose -f docker/docker-compose.yml run emcc make -j",
-    "docker:shell": "docker compose -f docker/docker-compose.yml run emcc bash -l"
+    "build:wasm": "docker compose -f docker/docker-compose.yml run --build --rm emcc make -j",
+    "docker:shell": "docker compose -f docker/docker-compose.yml run --build --rm emcc bash -l"
   },
   "devDependencies": {
-    "@types/node": "^20.11.7",
-    "@typescript-eslint/eslint-plugin": "^6.19.1",
-    "@typescript-eslint/parser": "^6.19.1",
+    "@types/node": "^20.11.19",
+    "@typescript-eslint/eslint-plugin": "^7.0.1",
+    "@typescript-eslint/parser": "^7.0.1",
     "cpy-cli": "^5.0.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
-    "prettier": "^3.2.4",
+    "prettier": "^3.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },

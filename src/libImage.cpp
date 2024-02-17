@@ -105,14 +105,12 @@ val optimize(std::string img_in, float width, float height, float quality, std::
         outWidth = outHeight * aspectSrc;
     }
 
-    SDL_Surface *newSurface = SDL_CreateRGBSurfaceWithFormat(0, static_cast<int>(outWidth), static_cast<int>(outHeight), 32, SDL_PIXELFORMAT_RGBA32);
+    SDL_Surface *newSurface = zoomSurface(srcSurface, (float)outWidth / srcWidth, (float)outHeight / srcHeight, SMOOTHING_ON);
+    SDL_FreeSurface(srcSurface);
     if (!newSurface)
     {
-        SDL_FreeSurface(srcSurface);
         return val::null();
     }
-    SDL_BlitScaled(srcSurface, nullptr, newSurface, nullptr);
-    SDL_FreeSurface(srcSurface);
 
     if (orientation > 1)
     {
