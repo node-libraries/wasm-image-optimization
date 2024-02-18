@@ -9,7 +9,7 @@ const main = async () => {
   for (const file of files) {
     const data = fs.readFileSync(`./images/${file}`);
     for (const format of formats) {
-      await optimizeImage({ image: data, quality: 100, format, width: 300 }).then((encoded) => {
+      await optimizeImage({ image: data, quality: 100, format, width: 100 }).then((encoded) => {
         console.log(encoded ? true : false, file, format);
         if (encoded) {
           const fileName = file.split('.')[0];

@@ -169,6 +169,17 @@ val optimize(std::string img_in, float width, float height, float quality, std::
     }
     else
     {
+        if (newSurface->format->format != SDL_PIXELFORMAT_RGBA32)
+        {
+            SDL_Surface *convertedSurface = SDL_ConvertSurfaceFormat(newSurface, SDL_PIXELFORMAT_RGBA32, 0);
+            SDL_FreeSurface(newSurface);
+            if (convertedSurface == NULL)
+            {
+                return val::null();
+            }
+            newSurface = convertedSurface;
+        }
+
         uint8_t *img_out;
         val result = val::null();
         int width = newSurface->w;
