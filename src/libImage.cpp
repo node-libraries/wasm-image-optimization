@@ -6,6 +6,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL.h>
 #include <libexif/exif-data.h>
+#include <avif/avif.h>
 
 using namespace emscripten;
 
@@ -179,21 +180,57 @@ val optimize(std::string img_in, float width, float height, float quality, std::
             }
             newSurface = convertedSurface;
         }
-
-        uint8_t *img_out;
-        val result = val::null();
-        int width = newSurface->w;
-        int height = newSurface->h;
-        int stride = width * 4;
-        size_t size = WebPEncodeRGBA(reinterpret_cast<uint8_t *>(newSurface->pixels), width, height, stride, quality, &img_out);
-        if (size > 0 && img_out)
+        if (format == "webp")
         {
-            result = val::global("Uint8Array").new_(typed_memory_view(size, img_out));
+            uint8_t *img_out;
+            val result = val::null();
+            int width = newSurface->w;
+            int height = newSurface->h;
+            int stride = width * 4;
+            size_t size = WebPEncodeRGBA(reinterpret_cast<uint8_t *>(newSurface->pixels), width, height, stride, quality, &img_out);
+            if (size > 0 && img_out)
+            {
+                result = val::global("Uint8Array").new_(typed_memory_view(size, img_out));
+            }
+            WebPFree(img_out);
+            SDL_FreeSurface(newSurface);
+            return result;
         }
-        WebPFree(img_out);
-        SDL_FreeSurface(newSurface);
-        return result;
-    }
+        else
+        {
+            int width = newSurface->w;
+            int height = newSurface->h;
+            avifImage *image = avifImageCreate(width, height, 8, AVIF_PIXEL_FORMAT_YUV444);
+
+            avifRGBImage rgb;
+            avifRGBImageSetDefaults(&rgb, image);
+            rgb.depth = 8;
+            rgb.format = AVIF_RGB_FORMAT_RGBA;
+            rgb.pixels = (uint8_t *)newSurface->pixels;
+            rgb.rowBytes = width * 4;
+
+            if (avifImageRGBToYUV(image, &rgb) != AVIF_RESULT_OK)
+            {
+                return val::null();
+            }
+            avifEncoder *encoder = avifEncoderCreate();
+            encoder->quality = (int)((quality) / 100 * 63);
+            encoder->speed = 6;
+
+            avifRWData raw = AVIF_DATA_EMPTY;
+
+            avifResult encodeResult = avifEncoderWrite(encoder, image, &raw);
+            avifEncoderDestroy(encoder);
+            avifImageDestroy(image);
+            if (encodeResult != AVIF_RESULT_OK)
+            {
+                return val::null();
+            }
+            val result = val::global("Uint8Array").new_(typed_memory_view(raw.size, raw.data));
+            avifRWDataFree(&raw);
+            return result;
+        }
+      }
 }
 
 EMSCRIPTEN_BINDINGS(my_module)

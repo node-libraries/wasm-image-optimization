@@ -1,4 +1,6 @@
-# wasm-image-optimization
+# wasm-image-optimization-avif
+
+Package size exceeds 1 MB, so it will not work with Workers' free plan.
 
 - Cloudflare workers  
   `import { optimizeImage } from 'wasm-image-optimization';`
@@ -13,7 +15,7 @@
 
 ```ts
 // quality: 1-100
-optimizeImage({image: ArrayBuffer, width?: number, height?:number,quality?: number,format?: "png" | "jpeg" | "webp"}): Promise<ArrayBuffer>
+optimizeImage({image: ArrayBuffer, width?: number, height?:number,quality?: number,format?: "png" | "jpeg" | "avif" | "webp"}): Promise<ArrayBuffer>
 ```
 
 - source format
@@ -25,14 +27,15 @@ optimizeImage({image: ArrayBuffer, width?: number, height?:number,quality?: numb
 - output format
   - jpeg
   - png
-  - webp(default)
+  - avif(default)
+  - webp
 
 # usage
 
 ## Next.js image optimization with Cloudflare
 
 ```ts
-import { optimizeImage } from 'wasm-image-optimization';
+import { optimizeImage } from "wasm-image-optimization-avif";
 
 const isValidUrl = (url: string) => {
   try {
@@ -48,54 +51,71 @@ const handleRequest = async (
   _env: {},
   ctx: ExecutionContext
 ): Promise<Response> => {
-  const accept = request.headers.get('accept');
+  const accept = request.headers.get("accept");
   const isWebp =
     accept
-      ?.split(',')
+      ?.split(",")
       .map((format) => format.trim())
-      .some((format) => ['image/webp', '*/*', 'image/*'].includes(format)) ?? true;
+      .some((format) => ["image/webp", "*/*", "image/*"].includes(format)) ??
+    true;
+  const isAvif =
+    accept
+      ?.split(",")
+      .map((format) => format.trim())
+      .some((format) => ["image/avif", "*/*", "image/*"].includes(format)) ??
+    true;
 
   const url = new URL(request.url);
 
   const params = url.searchParams;
-  const imageUrl = params.get('url');
+  const imageUrl = params.get("url");
   if (!imageUrl || !isValidUrl(imageUrl)) {
-    return new Response('url is required', { status: 400 });
+    return new Response("url is required", { status: 400 });
   }
 
   const cache = caches.default;
-  url.searchParams.append('webp', isWebp.toString());
+  url.searchParams.append("webp", isWebp.toString());
   const cacheKey = new Request(url.toString());
   const cachedResponse = await cache.match(cacheKey);
   if (cachedResponse) {
     return cachedResponse;
   }
 
-  const width = params.get('w');
-  const quality = params.get('q');
+  const width = params.get("w");
+  const quality = params.get("q");
 
-  const [srcImage, contentType] = await fetch(imageUrl, { cf: { cacheKey: imageUrl } })
+  const [srcImage, contentType] = await fetch(imageUrl, {
+    cf: { cacheKey: imageUrl },
+  })
     .then(async (res) =>
-      res.ok ? ([await res.arrayBuffer(), res.headers.get('content-type')] as const) : []
+      res.ok
+        ? ([await res.arrayBuffer(), res.headers.get("content-type")] as const)
+        : []
     )
     .catch(() => []);
 
   if (!srcImage) {
-    return new Response('image not found', { status: 404 });
+    return new Response("image not found", { status: 404 });
   }
 
-  if (contentType && ['image/svg+xml', 'image/gif'].includes(contentType)) {
+  if (contentType && ["image/svg+xml", "image/gif"].includes(contentType)) {
     const response = new Response(srcImage, {
       headers: {
-        'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=31536000, immutable',
+        "Content-Type": contentType,
+        "Cache-Control": "public, max-age=31536000, immutable",
       },
     });
     ctx.waitUntil(cache.put(cacheKey, response.clone()));
     return response;
   }
 
-  const format = isWebp ? 'webp' : contentType === 'image/jpeg' ? 'jpeg' : 'png';
+  const format = isAvif
+    ? "avif"
+    : isWebp
+      ? "webp"
+      : contentType === "image/jpeg"
+        ? "jpeg"
+        : "png";
   const image = await optimizeImage({
     image: srcImage,
     width: width ? parseInt(width) : undefined,
@@ -104,8 +124,8 @@ const handleRequest = async (
   });
   const response = new Response(image, {
     headers: {
-      'Content-Type': `image/${format}`,
-      'Cache-Control': 'public, max-age=31536000, immutable',
+      "Content-Type": `image/${format}`,
+      "Cache-Control": "public, max-age=31536000, immutable",
       date: new Date().toUTCString(),
     },
   });
@@ -126,7 +146,7 @@ export default {
  */
 const config = {
   images: {
-    path: 'https://xxx.yyy.workers.dev/',
+    path: "https://xxx.yyy.workers.dev/",
   },
 };
 export default config;
@@ -145,7 +165,7 @@ export default config;
 https://xxxx.deno.dev/?url=https://xxx.png&q=80&w=200
 
 ```ts
-import { optimizeImage } from 'npm:wasm-image-optimization/esm';
+import { optimizeImage } from "npm:wasm-image-optimization/esm";
 
 const isValidUrl = (url: string) => {
   try {
@@ -156,7 +176,7 @@ const isValidUrl = (url: string) => {
   }
 };
 
-const cache = await caches.open('image-cache');
+const cache = await caches.open("image-cache");
 
 Deno.serve(async (request) => {
   const cached = await cache.match(request);
@@ -166,55 +186,70 @@ Deno.serve(async (request) => {
 
   const url = new URL(request.url);
   const params = url.searchParams;
-  const type = ['webp', 'png', 'jpeg'].find((v) => v === params.get('type')) as
-    | 'webp'
-    | 'png'
-    | 'jpeg'
-    | undefined;
-  const accept = request.headers.get('accept');
+  const type = ["avif", "webp", "png", "jpeg"].find(
+    (v) => v === params.get("type")
+  ) as "avif" | "webp" | "png" | "jpeg" | undefined;
+  const accept = request.headers.get("accept");
+  const isAvif =
+    accept
+      ?.split(",")
+      .map((format) => format.trim())
+      .some((format) => ["image/avif", "*/*", "image/*"].includes(format)) ??
+    true;
   const isWebp =
     accept
-      ?.split(',')
+      ?.split(",")
       .map((format) => format.trim())
-      .some((format) => ['image/webp', '*/*', 'image/*'].includes(format)) ?? true;
+      .some((format) => ["image/webp", "*/*", "image/*"].includes(format)) ??
+    true;
 
-  const imageUrl = params.get('url');
+  const imageUrl = params.get("url");
   if (!imageUrl || !isValidUrl(imageUrl)) {
-    return new Response('url is required', { status: 400 });
+    return new Response("url is required", { status: 400 });
   }
 
-  url.searchParams.append('webp', isWebp.toString());
+  url.searchParams.append("avif", isAvif.toString());
   const cacheKey = new Request(url.toString());
   const cachedResponse = await cache.match(cacheKey);
   if (cachedResponse) {
     return cachedResponse;
   }
 
-  const width = params.get('w');
-  const quality = params.get('q');
+  const width = params.get("w");
+  const quality = params.get("q");
 
   const [srcImage, contentType] = await fetch(imageUrl)
     .then(async (res) =>
-      res.ok ? ([await res.arrayBuffer(), res.headers.get('content-type')] as const) : []
+      res.ok
+        ? ([await res.arrayBuffer(), res.headers.get("content-type")] as const)
+        : []
     )
     .catch(() => []);
 
   if (!srcImage) {
-    return new Response('image not found', { status: 404 });
+    return new Response("image not found", { status: 404 });
   }
 
-  if (contentType && ['image/svg+xml', 'image/gif'].includes(contentType)) {
+  if (contentType && ["image/svg+xml", "image/gif"].includes(contentType)) {
     const response = new Response(srcImage, {
       headers: {
-        'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=31536000, immutable',
+        "Content-Type": contentType,
+        "Cache-Control": "public, max-age=31536000, immutable",
       },
     });
     cache.put(request, response.clone());
     return response;
   }
 
-  const format = type ?? (isWebp ? 'webp' : contentType === 'image/jpeg' ? 'jpeg' : 'png');
+  const format =
+    type ??
+    (isAvif
+      ? "avif"
+      : isWebp
+        ? "webp"
+        : contentType === "image/jpeg"
+          ? "jpeg"
+          : "png");
   const image = await optimizeImage({
     image: srcImage,
     width: width ? parseInt(width) : undefined,
@@ -223,8 +258,8 @@ Deno.serve(async (request) => {
   });
   const response = new Response(image, {
     headers: {
-      'Content-Type': `image/${format}`,
-      'Cache-Control': 'public, max-age=31536000, immutable',
+      "Content-Type": `image/${format}`,
+      "Cache-Control": "public, max-age=31536000, immutable",
       date: new Date().toUTCString(),
     },
   });

@@ -12,7 +12,7 @@ TARGET_WORKERS = $(WORKERSDIR)/$(TARGET_ESM_BASE).js
 CFLAGS = -O3 -msimd128 \
         -Ilibwebp -Ilibwebp/src -Ilibavif/include -Ilibavif/third_party/libyuv/include -Ilibavif/ext/aom \
         -Ilibexif \
-        -DAVIF_CODEC_AOM_DECODE -DAVIF_CODEC_AOM=LOCAL
+        -DAVIF_CODEC_AOM_ENCODE -DAVIF_CODEC_AOM_DECODE -DAVIF_CODEC_AOM=LOCAL
 
 CFLAGS_ASM = --bind \
              -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s ENVIRONMENT=web -s DYNAMIC_EXECUTION=0 -s MODULARIZE=1 \

@@ -13,8 +13,8 @@ export const optimizeImage = async ({
   width?: number;
   height?: number;
   quality?: number;
-  format?: "jpeg" | "png" | "webp";
+  format?: "jpeg" | "png" | "webp" | "avif";
 }) =>
   libImage.then(({ optimize }) =>
-    optimize(image, width, height, quality, format),
+    optimize(image, width, height, quality, format)
   );
