@@ -1,7 +1,7 @@
 {
   "name": "wasm-image-optimization",
   "description": "Optimize images with wasm on edge runtime",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "exports": {
     "./esm": {
       "default": {
@@ -53,15 +53,18 @@
     "docker:shell": "docker compose -f docker/docker-compose.yml run --build --rm emcc bash -l"
   },
   "devDependencies": {
-    "@types/node": "^20.11.19",
-    "@typescript-eslint/eslint-plugin": "^7.0.1",
-    "@typescript-eslint/parser": "^7.0.1",
+    "@types/node": "^22.5.1",
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
     "cpy-cli": "^5.0.0",
-    "eslint": "^8.56.0",
+    "eslint": "9.9.1",
     "eslint-config-prettier": "^9.1.0",
-    "prettier": "^3.2.5",
+    "eslint-import-resolver-typescript": "^3.6.3",
+    "eslint-plugin-import": "^2.29.1",
+    "prettier": "^3.3.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.3.0"
   },
   "publishConfig": {
     "access": "public"

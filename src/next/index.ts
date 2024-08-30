@@ -1,5 +1,5 @@
-import LibImage from '../workers//libImage.js';
-import WASM from '../esm/libImage.wasm?module';
+import WASM from "../esm/libImage.wasm?module";
+import LibImage from "../workers//libImage.js";
 
 const libImage = LibImage({
   instantiateWasm: async (imports, receiver) => {
@@ -12,11 +12,14 @@ export const optimizeImage = async ({
   width = 0,
   height = 0,
   quality = 100,
-  format = 'webp',
+  format = "webp",
 }: {
   image: BufferSource;
   width?: number;
   height?: number;
   quality?: number;
-  format?: 'jpeg' | 'png' | 'webp';
-}) => libImage.then(({ optimize }) => optimize(image, width, height, quality, format));
+  format?: "jpeg" | "png" | "webp";
+}) =>
+  libImage.then(({ optimize }) =>
+    optimize(image, width, height, quality, format),
+  );

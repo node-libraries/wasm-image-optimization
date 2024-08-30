@@ -4,14 +4,16 @@ export declare type ModuleType = {
     width: number,
     height: number,
     quality: number,
-    format: 'jpeg' | 'png' | 'webp'
+    format: "jpeg" | "png" | "webp",
   ) => Uint8Array | null;
 };
 
 declare const imageTools: (options?: {
   instantiateWasm?: (
     imports?: WebAssembly.Imports,
-    receiver: (instance: WebAssembly.WebAssemblyInstantiatedSource) => Promise<unknown>
+    receiver: (
+      instance: WebAssembly.WebAssemblyInstantiatedSource,
+    ) => Promise<unknown>,
   ) => void;
   locateFile?: (path: string, scriptDirectory: string) => string;
   wasmBinary?: ArrayBuffer;
