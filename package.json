@@ -77,6 +77,7 @@
     "workers",
     "WebAssembly"
   ],
-  "repository": "https://github.com/node-libraries/wasm-image-optimization",
-  "author": "SoraKumo <info@croud.jp>"
+  "repository": "https://github.com/node-libraries/wasm-image-optimization-avif",
+  "author": "SoraKumo <info@croud.jp>",
+  "main": "index.js"
 }
