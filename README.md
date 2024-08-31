@@ -1,12 +1,13 @@
 # wasm-image-optimization-avif
 
 Package size exceeds 1 MB, so it will not work with Workers' free plan.
+If it is Deno Deploy, it works with the free plan.
 
 - Cloudflare workers  
   `import { optimizeImage } from 'wasm-image-optimization';`
 - Next.js(Webpack)  
   `import { optimizeImage } from 'wasm-image-optimization/next';`
-- ESM(import base)  
+- ESM(import base) & Deno Deploy  
   `import { optimizeImage } from 'wasm-image-optimization/esm';`
 - CJS(file base)  
   `import { optimizeImage } from 'wasm-image-optimization/node';`
@@ -165,7 +166,7 @@ export default config;
 https://xxxx.deno.dev/?url=https://xxx.png&q=80&w=200
 
 ```ts
-import { optimizeImage } from "npm:wasm-image-optimization/esm";
+import { optimizeImage } from "npm:wasm-image-optimization-avif/esm";
 
 const isValidUrl = (url: string) => {
   try {
@@ -176,39 +177,46 @@ const isValidUrl = (url: string) => {
   }
 };
 
-const cache = await caches.open("image-cache");
+const isType = (accept: string | null, type: string) => {
+  return (
+    accept
+      ?.split(",")
+      .map((format) => format.trim())
+      .some((format) => [`image/${type}`, "*/*", "image/*"].includes(format)) ??
+    true
+  );
+};
 
 Deno.serve(async (request) => {
-  const cached = await cache.match(request);
-  if (cached) {
-    return cached;
-  }
-
   const url = new URL(request.url);
   const params = url.searchParams;
   const type = ["avif", "webp", "png", "jpeg"].find(
     (v) => v === params.get("type")
   ) as "avif" | "webp" | "png" | "jpeg" | undefined;
   const accept = request.headers.get("accept");
-  const isAvif =
-    accept
-      ?.split(",")
-      .map((format) => format.trim())
-      .some((format) => ["image/avif", "*/*", "image/*"].includes(format)) ??
-    true;
-  const isWebp =
-    accept
-      ?.split(",")
-      .map((format) => format.trim())
-      .some((format) => ["image/webp", "*/*", "image/*"].includes(format)) ??
-    true;
+  const isAvif = isType(accept, "avif");
+  const isWebp = isType(accept, "webp");
+
+  const cache = await caches.open(
+    `image-${isAvif ? "-avif" : ""}${isWebp ? "-webp" : ""}`
+  );
+
+  const cached = await cache.match(request);
+  if (cached) {
+    return cached;
+  }
 
   const imageUrl = params.get("url");
   if (!imageUrl || !isValidUrl(imageUrl)) {
     return new Response("url is required", { status: 400 });
   }
 
-  url.searchParams.append("avif", isAvif.toString());
+  if (isAvif) {
+    url.searchParams.append("avif", isAvif.toString());
+  } else if (isWebp) {
+    url.searchParams.append("webp", isWebp.toString());
+  }
+
   const cacheKey = new Request(url.toString());
   const cachedResponse = await cache.match(cacheKey);
   if (cachedResponse) {
