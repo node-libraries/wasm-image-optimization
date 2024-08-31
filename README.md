@@ -43,11 +43,11 @@ optimizeImage({image: ArrayBuffer, width?: number, height?:number,quality?: numb
 | w    | number | Width                      |
 | type | string | Output type(webp/png/jpeg) |
 
-https://github.com/SoraKumo001/cloudflare-workers-image-optimization
-
 https://xxx.yyy.workers.dev/?url=https://xxx.png&q=80&w=200
 
 ### Source code
+
+https://github.com/SoraKumo001/cloudflare-workers-image-optimization
 
 ```ts
 import { optimizeImage } from "wasm-image-optimization";
