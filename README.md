@@ -1,16 +1,16 @@
 # wasm-image-optimization-avif
 
-Package size exceeds 1 MB, so it will not work with Workers' free plan.
+Package size exceeds 1 MB, so it will not work with Workers' free plan.  
 If it is Deno Deploy, it works with the free plan.
 
 - Cloudflare workers  
-  `import { optimizeImage } from 'wasm-image-optimization';`
+  `import { optimizeImage } from 'wasm-image-optimization-avif';`
 - Next.js(Webpack)  
-  `import { optimizeImage } from 'wasm-image-optimization/next';`
+  `import { optimizeImage } from 'wasm-image-optimization-avif/next';`
 - ESM(import base) & Deno Deploy  
-  `import { optimizeImage } from 'wasm-image-optimization/esm';`
+  `import { optimizeImage } from 'wasm-image-optimization-avif/esm';`
 - CJS(file base)  
-  `import { optimizeImage } from 'wasm-image-optimization/node';`
+  `import { optimizeImage } from 'wasm-image-optimization-avif/node';`
 
 - function
 
