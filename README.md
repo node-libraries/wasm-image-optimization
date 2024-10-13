@@ -17,6 +17,9 @@ If it is Deno Deploy, it works with the free plan.
 ```ts
 // quality: 1-100
 optimizeImage({image: ArrayBuffer, width?: number, height?:number,quality?: number,format?: "png" | "jpeg" | "avif" | "webp"}): Promise<ArrayBuffer>
+
+optimizeImageExt({image: ArrayBuffer, width?: number, height?:number,quality?: number,format?: "png" | "jpeg" | "avif" | "webp"}): Promise<{data: Uint8Array;originalWidth: number;originalHeight: number; width: number;height: number;}>
+
 ```
 
 - source format

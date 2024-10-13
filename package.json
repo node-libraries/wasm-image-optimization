@@ -1,7 +1,7 @@
 {
   "name": "wasm-image-optimization-avif",
   "description": "Optimize images with wasm on edge runtime",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "exports": {
     "./esm": {
       "default": {

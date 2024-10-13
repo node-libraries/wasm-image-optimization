@@ -5,7 +5,13 @@ export declare type ModuleType = {
     height: number,
     quality: number,
     format: "jpeg" | "png" | "webp" | "avif"
-  ) => Uint8Array | null;
+  ) => {
+    data: Uint8Array;
+    originalWidth: number;
+    originalHeight: number;
+    width: number;
+    height: number;
+  } | null;
 };
 
 declare const imageTools: (options?: {

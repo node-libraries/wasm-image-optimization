@@ -14,6 +14,17 @@ EM_JS(void, js_console_log, (const char *str), {
     console.log(UTF8ToString(str));
 });
 
+val createResult(size_t size, const uint8_t *data, float originalWidth, float originalHeight, float width, float height)
+{
+    val result = val::object();
+    result.set("data", val(typed_memory_view(size, data)));
+    result.set("originalWidth", originalWidth);
+    result.set("originalHeight", originalHeight);
+    result.set("width", width);
+    result.set("height", height);
+    return result;
+}
+
 class MemoryRW
 {
 public:
@@ -164,7 +175,7 @@ val optimize(std::string img_in, float width, float height, float quality, std::
         val result = val::null();
         if (memoryRW.size())
         {
-            result = val::global("Uint8Array").new_(typed_memory_view(memoryRW.size(), memoryRW.data()));
+            result = createResult(memoryRW.size(), memoryRW.data(), srcWidth, srcHeight, outWidth, outHeight);
         }
         return result;
     }
@@ -190,7 +201,7 @@ val optimize(std::string img_in, float width, float height, float quality, std::
             size_t size = WebPEncodeRGBA(reinterpret_cast<uint8_t *>(newSurface->pixels), width, height, stride, quality, &img_out);
             if (size > 0 && img_out)
             {
-                result = val::global("Uint8Array").new_(typed_memory_view(size, img_out));
+                result = createResult(size, img_out, srcWidth, srcHeight, outWidth, outHeight);
             }
             WebPFree(img_out);
             SDL_FreeSurface(newSurface);
@@ -226,11 +237,11 @@ val optimize(std::string img_in, float width, float height, float quality, std::
             {
                 return val::null();
             }
-            val result = val::global("Uint8Array").new_(typed_memory_view(raw.size, raw.data));
+            val result = createResult(raw.size, raw.data, srcWidth, srcHeight, outWidth, outHeight);
             avifRWDataFree(&raw);
             return result;
         }
-      }
+    }
 }
 
 EMSCRIPTEN_BINDINGS(my_module)
