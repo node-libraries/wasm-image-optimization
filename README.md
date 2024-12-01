@@ -1,4 +1,4 @@
-# wasm-image-optimization-avif
+# wasm-image-optimization
 
 - Cloudflare workers  
   `import { optimizeImage } from 'wasm-image-optimization';`
