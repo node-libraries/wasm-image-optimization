@@ -16,3 +16,4 @@ typings.d.ts
 /image_output
 /.vscode
 /docker
+pnpm-lock.yaml

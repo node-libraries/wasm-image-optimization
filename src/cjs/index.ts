@@ -3,7 +3,9 @@ import path from "path";
 import LibImage from "../workers/libImage";
 
 const libImage = LibImage({
-  wasmBinary: fs.readFileSync(path.resolve(__dirname, "../esm/libImage.wasm")),
+  wasmBinary: fs.readFileSync(
+    path.resolve(__dirname, "../esm/libImage.wasm")
+  ) as never,
 });
 
 export const optimizeImage = async ({

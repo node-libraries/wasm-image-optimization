@@ -23,6 +23,38 @@ const main = async () => {
       });
     }
   }
+  const urls = [
+    "https://raw.githubusercontent.com/AOMediaCodec/av1-avif/refs/heads/master/testFiles/Apple/multilayer_examples/animals_00_singlelayer.avif",
+    "https://raw.githubusercontent.com/AOMediaCodec/av1-avif/refs/heads/master/testFiles/Microsoft/Chimera_10bit_cropped_to_1920x1008.avif",
+  ];
+  for (const url of urls) {
+    const data = await fetch(url).then((res) => res.arrayBuffer());
+    const u = new URL(url);
+    const file = u.pathname.split("/").pop();
+    if (!file) return;
+    await optimizeImage({
+      image: data,
+      quality: 100,
+      format: "jpeg",
+      width: 300,
+    }).then(async (encoded) => {
+      for (const format of formats) {
+        await optimizeImage({
+          image: data,
+          quality: 100,
+          format,
+          width: 100,
+        }).then((encoded) => {
+          console.log(encoded ? true : false, file, format);
+          if (encoded) {
+            const fileName = file.split(".")[0];
+            fs.writeFileSync(`image_output/${fileName}.${format}`, encoded);
+          }
+        });
+      }
+    });
+  }
+
   for (let i = 0; i <= 8; i++) {
     const data = await fetch(
       `https://raw.githubusercontent.com/recurser/exif-orientation-examples/master/Landscape_${i}.jpg`
