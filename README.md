@@ -1,16 +1,13 @@
 # wasm-image-optimization-avif
 
-Package size exceeds 1 MB, so it will not work with Workers' free plan.  
-If it is Deno Deploy, it works with the free plan.
-
 - Cloudflare workers  
-  `import { optimizeImage } from 'wasm-image-optimization-avif';`
+  `import { optimizeImage } from 'wasm-image-optimization';`
 - Next.js(Webpack)  
-  `import { optimizeImage } from 'wasm-image-optimization-avif/next';`
+  `import { optimizeImage } from 'wasm-image-optimization/next';`
 - ESM(import base) & Deno Deploy  
-  `import { optimizeImage } from 'wasm-image-optimization-avif/esm';`
+  `import { optimizeImage } from 'wasm-image-optimization/esm';`
 - CJS(file base)  
-  `import { optimizeImage } from 'wasm-image-optimization-avif/node';`
+  `import { optimizeImage } from 'wasm-image-optimization/node';`
 
 - function
 
@@ -39,7 +36,7 @@ optimizeImageExt({image: ArrayBuffer, width?: number, height?:number,quality?: n
 ## Next.js image optimization with Cloudflare
 
 ```ts
-import { optimizeImage } from "wasm-image-optimization-avif";
+import { optimizeImage } from "wasm-image-optimization";
 
 const isValidUrl = (url: string) => {
   try {
@@ -169,7 +166,7 @@ export default config;
 https://xxxx.deno.dev/?url=https://xxx.png&q=80&w=200
 
 ```ts
-import { optimizeImage } from "npm:wasm-image-optimization-avif/esm";
+import { optimizeImage } from "npm:wasm-image-optimization/esm";
 
 const isValidUrl = (url: string) => {
   try {

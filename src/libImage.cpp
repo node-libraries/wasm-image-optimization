@@ -14,17 +14,6 @@ EM_JS(void, js_console_log, (const char *str), {
     console.log(UTF8ToString(str));
 });
 
-val createResult(size_t size, const uint8_t *data, float originalWidth, float originalHeight, float width, float height)
-{
-    val result = val::object();
-    result.set("data", val(typed_memory_view(size, data)));
-    result.set("originalWidth", originalWidth);
-    result.set("originalHeight", originalHeight);
-    result.set("width", width);
-    result.set("height", height);
-    return result;
-}
-
 class MemoryRW
 {
 public:
@@ -76,6 +65,17 @@ int getOrientation(std::string img)
     }
     exif_data_unref(ed);
     return orientation;
+}
+
+val createResult(size_t size, const uint8_t *data, float originalWidth, float originalHeight, float width, float height)
+{
+    val result = val::object();
+    result.set("data", val(typed_memory_view(size, data)));
+    result.set("originalWidth", originalWidth);
+    result.set("originalHeight", originalHeight);
+    result.set("width", width);
+    result.set("height", height);
+    return result;
 }
 
 val optimize(std::string img_in, float width, float height, float quality, std::string format)
