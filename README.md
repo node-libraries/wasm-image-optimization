@@ -20,16 +20,16 @@ optimizeImageExt({image: ArrayBuffer, width?: number, height?:number,quality?: n
 ```
 
 - source format
+  - svg
   - jpeg(EXIF orientation is supported)
   - png
   - webp
-  - svg
   - avif
 - output format
   - jpeg
   - png
-  - avif(default)
   - webp
+  - avif(default)
 
 # usage
 
