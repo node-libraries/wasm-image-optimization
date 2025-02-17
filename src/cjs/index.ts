@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import LibImage from "../workers/libImage";
+import type { ModuleType } from "../esm/libImage";
 
 const libImage = LibImage({
   wasmBinary: fs.readFileSync(
@@ -8,6 +9,13 @@ const libImage = LibImage({
   ) as never,
 });
 
+const result = (result?: ReturnType<ModuleType["optimize"]>) => {
+  const r = result ? { ...result, data: Buffer.from(result.data) } : undefined;
+  if (r) {
+    libImage.then(({ releaseResult }) => releaseResult(r.index));
+  }
+  return r;
+};
 export const optimizeImage = async ({
   image,
   width = 0,
@@ -21,10 +29,9 @@ export const optimizeImage = async ({
   quality?: number;
   format?: "jpeg" | "png" | "webp" | "avif";
 }) =>
-  libImage.then(({ optimize }) => {
-    const result = optimize(image, width, height, quality, format);
-    return result?.data;
-  });
+  optimizeImageExt({ image, width, height, quality, format }).then(
+    (r) => r?.data
+  );
 
 export const optimizeImageExt = async ({
   image,
@@ -39,6 +46,6 @@ export const optimizeImageExt = async ({
   quality?: number;
   format?: "jpeg" | "png" | "webp" | "avif";
 }) =>
-  libImage.then(({ optimize }) => {
-    return optimize(image, width, height, quality, format);
-  });
+  libImage.then(({ optimize }) =>
+    result(optimize(image, width, height, quality, format))
+  );

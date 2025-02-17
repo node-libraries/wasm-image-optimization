@@ -37,7 +37,7 @@ const main = async () => {
       quality: 100,
       format: "jpeg",
       width: 300,
-    }).then(async (encoded) => {
+    }).then(async () => {
       for (const format of formats) {
         await optimizeImage({
           image: data,

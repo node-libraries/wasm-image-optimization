@@ -11,7 +11,9 @@ export declare type ModuleType = {
     originalHeight: number;
     width: number;
     height: number;
+    index: number;
   } | null;
+  releaseResult: (index: number) => void;
 };
 
 declare const imageTools: (options?: {

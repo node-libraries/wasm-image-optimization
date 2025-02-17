@@ -1,13 +1,20 @@
-import LibImage from "./libImage.js";
+import LibImage, { type ModuleType } from "./libImage.js";
 
 const libImage = LibImage();
 
+const result = (result?: ReturnType<ModuleType["optimize"]>) => {
+  const r = result ? { ...result, data: Buffer.from(result.data) } : undefined;
+  if (r) {
+    libImage.then(({ releaseResult }) => releaseResult(r.index));
+  }
+  return r;
+};
 export const optimizeImage = async ({
   image,
   width = 0,
   height = 0,
   quality = 100,
-  format = "webp",
+  format = "avif",
 }: {
   image: BufferSource;
   width?: number;
@@ -15,10 +22,9 @@ export const optimizeImage = async ({
   quality?: number;
   format?: "jpeg" | "png" | "webp" | "avif";
 }) =>
-  libImage.then(({ optimize }) => {
-    const result = optimize(image, width, height, quality, format);
-    return result?.data;
-  });
+  optimizeImageExt({ image, width, height, quality, format }).then(
+    (r) => r?.data
+  );
 
 export const optimizeImageExt = async ({
   image,
@@ -33,6 +39,6 @@ export const optimizeImageExt = async ({
   quality?: number;
   format?: "jpeg" | "png" | "webp" | "avif";
 }) =>
-  libImage.then(({ optimize }) => {
-    return optimize(image, width, height, quality, format);
-  });
+  libImage.then(({ optimize }) =>
+    result(optimize(image, width, height, quality, format))
+  );

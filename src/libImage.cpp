@@ -14,6 +14,38 @@ EM_JS(void, js_console_log, (const char *str), {
     console.log(UTF8ToString(str));
 });
 
+class MemoryManager
+{
+private:
+    std::map<int, uint8_t *> m_map;
+    int m_index;
+
+public:
+    MemoryManager()
+    {
+        m_index = 0;
+    }
+    int getIndex() { return m_index; }
+    uint8_t *allocate(const uint8_t *data, size_t size)
+    {
+        uint8_t *ptr = new uint8_t[size];
+        memcpy(ptr, data, size);
+        m_map[m_index++] = ptr;
+        return ptr;
+    }
+    void release(int index)
+    {
+        uint8_t *ptr = m_map[index];
+        if (ptr)
+        {
+            delete[] ptr;
+        }
+        m_map.erase(index);
+    }
+};
+
+MemoryManager memoryManager;
+
 class MemoryRW
 {
 public:
@@ -69,13 +101,21 @@ int getOrientation(std::string img)
 
 val createResult(size_t size, const uint8_t *data, float originalWidth, float originalHeight, float width, float height)
 {
+    int index = memoryManager.getIndex();
+    uint8_t *ptr = memoryManager.allocate(data, size);
     val result = val::object();
-    result.set("data", val(typed_memory_view(size, data)));
+    result.set("data", val(typed_memory_view(size, ptr)));
     result.set("originalWidth", originalWidth);
     result.set("originalHeight", originalHeight);
     result.set("width", width);
     result.set("height", height);
+    result.set("index", index);
     return result;
+}
+
+void releaseResult(int index)
+{
+    memoryManager.release(index);
 }
 
 val optimize(std::string img_in, float width, float height, float quality, std::string format)
@@ -247,4 +287,5 @@ val optimize(std::string img_in, float width, float height, float quality, std::
 EMSCRIPTEN_BINDINGS(my_module)
 {
     function("optimize", &optimize);
+    function("releaseResult", &releaseResult);
 }
