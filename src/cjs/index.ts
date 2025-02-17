@@ -10,7 +10,9 @@ const libImage = LibImage({
 });
 
 const result = (result?: ReturnType<ModuleType["optimize"]>) => {
-  const r = result ? { ...result, data: Buffer.from(result.data) } : undefined;
+  const r = result
+    ? { ...result, data: Uint8Array.from(result.data) }
+    : undefined;
   if (r) {
     libImage.then(({ releaseResult }) => releaseResult(r.index));
   }
