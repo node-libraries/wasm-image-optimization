@@ -30,7 +30,7 @@ export const optimizeImage = async ({
   format?: "jpeg" | "png" | "webp" | "avif";
 }) =>
   optimizeImageExt({ image, width, height, quality, format }).then(
-    (r) => r?.data
+    (r) => r?.data,
   );
 
 export const optimizeImageExt = async ({
@@ -47,5 +47,5 @@ export const optimizeImageExt = async ({
   format?: "jpeg" | "png" | "webp" | "avif";
 }) =>
   libImage.then(({ optimize }) =>
-    result(optimize(image, width, height, quality, format))
+    result(optimize(image, width, height, quality, format)),
   );
