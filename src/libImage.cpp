@@ -7,8 +7,10 @@
 #include <SDL2/SDL.h>
 #include <libexif/exif-data.h>
 #include <avif/avif.h>
+#include <lunasvg.h>
 
 using namespace emscripten;
+using namespace lunasvg;
 
 EM_JS(void, js_console_log, (const char *str), {
     console.log(UTF8ToString(str));
@@ -17,30 +19,26 @@ EM_JS(void, js_console_log, (const char *str), {
 class MemoryManager
 {
 private:
-    std::map<int, uint8_t *> m_map;
-    int m_index;
+    uint8_t *m_ptr;
 
 public:
     MemoryManager()
     {
-        m_index = 0;
+        m_ptr = NULL;
     }
-    int getIndex() { return m_index; }
     uint8_t *allocate(const uint8_t *data, size_t size)
     {
         uint8_t *ptr = new uint8_t[size];
         memcpy(ptr, data, size);
-        m_map[m_index++] = ptr;
+        m_ptr = ptr;
         return ptr;
     }
-    void release(int index)
+    void release()
     {
-        uint8_t *ptr = m_map[index];
-        if (ptr)
+        if (m_ptr)
         {
-            delete[] ptr;
+            delete m_ptr;
         }
-        m_map.erase(index);
     }
 };
 
@@ -101,7 +99,6 @@ int getOrientation(std::string img)
 
 val createResult(size_t size, const uint8_t *data, float originalWidth, float originalHeight, float width, float height)
 {
-    int index = memoryManager.getIndex();
     uint8_t *ptr = memoryManager.allocate(data, size);
     val result = val::object();
     result.set("data", val(typed_memory_view(size, ptr)));
@@ -109,26 +106,39 @@ val createResult(size_t size, const uint8_t *data, float originalWidth, float or
     result.set("originalHeight", originalHeight);
     result.set("width", width);
     result.set("height", height);
-    result.set("index", index);
     return result;
 }
 
-void releaseResult(int index)
+void releaseResult()
 {
-    memoryManager.release(index);
+    memoryManager.release();
 }
 
 val optimize(std::string img_in, float width, float height, float quality, std::string format)
 {
     int orientation = getOrientation(img_in);
-
+    Bitmap bitmap;
     SDL_RWops *rw = SDL_RWFromConstMem(img_in.c_str(), img_in.size());
     if (!rw)
     {
         return val::null();
     }
-
-    SDL_Surface *srcSurface = IMG_Load_RW(rw, 1);
+    SDL_Surface *srcSurface;
+    if (IMG_isSVG(rw))
+    {
+        auto document = Document::loadFromData(img_in.c_str(), img_in.length());
+        if (!document.get())
+            return val::null();
+        bitmap = document->renderToBitmap(width == 0 ? -1 : width, height == 0 ? -1 : height);
+        bitmap.convertToRGBA();
+        if (bitmap.isNull())
+            return val::null();
+        srcSurface = SDL_CreateRGBSurfaceWithFormatFrom(bitmap.data(), bitmap.width(), bitmap.height(), 32, bitmap.stride(), SDL_PIXELFORMAT_RGBA32);
+    }
+    else
+    {
+        srcSurface = IMG_Load_RW(rw, 1);
+    }
     SDL_FreeRW(rw);
     if (!srcSurface)
     {

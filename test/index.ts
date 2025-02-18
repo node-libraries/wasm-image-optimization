@@ -44,6 +44,7 @@ const main = async () => {
           quality: 100,
           format,
           width: 100,
+          height: 100,
         }).then((encoded) => {
           console.log(encoded ? true : false, file, format);
           if (encoded) {

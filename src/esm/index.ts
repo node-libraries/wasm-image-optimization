@@ -7,7 +7,7 @@ const result = (result?: ReturnType<ModuleType["optimize"]>) => {
     ? { ...result, data: Uint8Array.from(result.data) }
     : undefined;
   if (r) {
-    libImage.then(({ releaseResult }) => releaseResult(r.index));
+    libImage.then(({ releaseResult }) => releaseResult());
   }
   return r;
 };

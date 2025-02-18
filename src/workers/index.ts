@@ -7,13 +7,14 @@ const libImage = LibImage({
   },
 });
 
-const result = (result?: ReturnType<ModuleType["optimize"]>) => {
+const result = (
+  result: ReturnType<ModuleType["optimize"]> | undefined,
+  releaseResult: () => void,
+) => {
   const r = result
     ? { ...result, data: Uint8Array.from(result.data) }
     : undefined;
-  if (r) {
-    libImage.then(({ releaseResult }) => releaseResult(r.index));
-  }
+  releaseResult();
   return r;
 };
 export const optimizeImage = async ({
@@ -46,6 +47,6 @@ export const optimizeImageExt = async ({
   quality?: number;
   format?: "jpeg" | "png" | "webp" | "avif";
 }) =>
-  libImage.then(({ optimize }) =>
-    result(optimize(image, width, height, quality, format)),
+  libImage.then(({ optimize, releaseResult }) =>
+    result(optimize(image, width, height, quality, format), releaseResult),
   );

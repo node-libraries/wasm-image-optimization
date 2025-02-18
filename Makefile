@@ -11,7 +11,7 @@ TARGET_WORKERS = $(WORKERSDIR)/$(TARGET_ESM_BASE).js
 
 CFLAGS = -O3 -msimd128 -sSTACK_SIZE=5MB \
         -Ilibwebp -Ilibwebp/src -Ilibavif/include -Ilibavif/third_party/libyuv/include -Ilibavif/ext/aom \
-        -Ilibexif \
+        -Ilibexif -Ilunasvg/include -Ilunasvg/plutovg/include \
         -DAVIF_CODEC_AOM_ENCODE -DAVIF_CODEC_AOM_DECODE -DAVIF_CODEC_AOM=LOCAL
 
 CFLAGS_ASM = --bind \
@@ -55,15 +55,23 @@ EXIF_SOURCES := $(wildcard libexif/libexif/*.c) \
                 $(wildcard libexif/libexif/olympus/*.c) \
                 $(wildcard libexif/libexif/pentax/*.c) 
 
+SVG_SOURCES := $(wildcard lunasvg/source/*.cpp)
+OVG_SOURCES := $(wildcard lunasvg/plutovg/source/*.c)
+
 WEBP_OBJECTS := $(WEBP_SOURCES:.c=.o)
 AVIF_OBJECTS := $(AVIF_SOURCES:.c=.o)
 EXIF_OBJECTS := $(EXIF_SOURCES:.c=.o)
+SVG_OBJECTS := $(SVG_SOURCES:.cpp=.o)
+OVG_OBJECTS := $(OVG_SOURCES:.c=.o)
 
 .PHONY: all esm workers clean
 
 all: esm workers
 
-$(WEBP_OBJECTS) $(AVIF_OBJECTS): %.o: %.c | $(LIBDIR)/aom_build/libaom.a
+$(WEBP_OBJECTS) $(AVIF_OBJECTS)  $(OVG_OBJECTS): %.o: %.c | $(LIBDIR)/aom_build/libaom.a
+	@emcc $(CFLAGS) -c $< -o $@
+
+$(SVG_OBJECTS): %.o: %.cpp
 	@emcc $(CFLAGS) -c $< -o $@
 
 $(LIBDIR)/aom_build/libaom.a:
@@ -95,18 +103,26 @@ $(WORKDIR)/libexif.a: $(EXIF_SOURCES)
 	@cd libexif && autoreconf -i && emconfigure ./configure && cd libexif && emmake make
 	@emar rcs $@ $(EXIF_OBJECTS)
 
+$(WORKDIR)/svg.a: $(WORKDIR) $(SVG_OBJECTS)
+	@emar rcs $@ $(SVG_OBJECTS)
+$(WORKDIR)/ovg.a: $(WORKDIR) $(OVG_OBJECTS)
+	@emar rcs $@ $(OVG_OBJECTS)
+
+
 $(ESMDIR) $(WORKERSDIR):
 	@mkdir -p $@
 
 esm: $(TARGET_ESM)
 
-$(TARGET_ESM): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(WORKDIR)/libexif.a $(LIBDIR)/aom_build/libaom.a | $(ESMDIR)
+$(TARGET_ESM): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(WORKDIR)/libexif.a $(LIBDIR)/aom_build/libaom.a \
+       $(WORKDIR)/svg.a $(WORKDIR)/ovg.a | $(ESMDIR)
 	emcc $(CFLAGS) -o $@ $^ \
        $(CFLAGS_ASM)  -s EXPORT_ES6=1
 
 workers: $(TARGET_WORKERS)
 
-$(TARGET_WORKERS): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(WORKDIR)/libexif.a $(LIBDIR)/aom_build/libaom.a | $(WORKERSDIR)
+$(TARGET_WORKERS): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(WORKDIR)/libexif.a $(LIBDIR)/aom_build/libaom.a \
+       $(WORKDIR)/svg.a $(WORKDIR)/ovg.a | $(WORKERSDIR)
 	emcc $(CFLAGS) -o $@ $^ \
        $(CFLAGS_ASM)
 	@rm $(WORKERSDIR)/$(TARGET_ESM_BASE).wasm
