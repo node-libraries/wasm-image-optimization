@@ -1,5 +1,9 @@
-import LibImage from "./libImage.js";
-import WASM from "../esm/libImage.wasm";
+import fs from "fs";
+import path from "path";
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+/* @ts-ignore */
+import LibImage from "../../workers/libImage.js";
 import {
   _optimizeImage,
   _optimizeImageExt,
@@ -7,9 +11,9 @@ import {
 } from "../lib/optimizeImage.js";
 
 const libImage = LibImage({
-  instantiateWasm: async (imports, receiver) => {
-    receiver(await WebAssembly.instantiate(WASM, imports));
-  },
+  wasmBinary: fs.readFileSync(
+    path.resolve(__dirname, "../../esm/libImage.wasm")
+  ) as never,
 });
 
 export const optimizeImage = async (params: OptimizeParams) =>

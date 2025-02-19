@@ -8,6 +8,8 @@
   `import { optimizeImage } from 'wasm-image-optimization/esm';`
 - CJS(file base)  
   `import { optimizeImage } from 'wasm-image-optimization/node';`
+- Vite(Browser)  
+  `import { optimizeImage } from 'wasm-image-optimization/vite';`
 
 - function
 

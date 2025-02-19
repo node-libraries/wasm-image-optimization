@@ -1,7 +1,7 @@
 {
   "name": "wasm-image-optimization",
   "description": "Optimize images with wasm on edge runtime",
-  "version": "1.1.5",
+  "version": "1.1.7",
   "exports": {
     "./esm": {
       "default": {
@@ -17,22 +17,33 @@
     },
     "./node": {
       "default": {
-        "types": "./dist/cjs/index.d.ts",
-        "default": "./dist/cjs/index.js"
+        "types": "./dist/cjs/node/index.d.ts",
+        "default": "./dist/cjs/node/index.js"
+      }
+    },
+    "./vite": {
+      "default": {
+        "types": "./dist/vite/index.d.ts",
+        "default": "./dist/vite/index.js"
+      }
+    },
+    "./wasm": {
+      "default": {
+        "default": "./dist/esm/libImage.wasm"
       }
     },
     ".": {
       "require": {
-        "types": "./dist/cjs/index.d.ts",
-        "node": "./dist/cjs/index.js",
+        "types": "./dist/cjs/node/index.d.ts",
+        "node": "./dist/cjs/node/index.js",
         "edge-light": "./dist/esm/index.js",
         "workerd": "./dist/workers/index.js",
         "worker": "./dist/workers/index.js",
         "browser": "./dist/esm/index.js"
       },
       "import": {
-        "types": "./dist/cjs/index.d.ts",
-        "node": "./dist/esm/index.js",
+        "types": "./dist/cjs/node/index.d.ts",
+        "node": "./dist/cjs/node/index.js",
         "edge-light": "./dist/esm/index.js",
         "workerd": "./dist/workers/index.js",
         "worker": "./dist/workers/index.js",
@@ -53,7 +64,10 @@
         "./dist/next/index.d.ts"
       ],
       "node": [
-        "./dist/cjs/index.d.ts"
+        "./dist/cjs/node/index.d.ts"
+      ],
+      "vite": [
+        "./dist/esm/index.d.ts"
       ],
       "*": [
         "./dist/workers/index.d.ts"

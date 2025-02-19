@@ -94,7 +94,7 @@
     "node_modules",
     "dist",
     "test",
-    "src/csj",
+    "src/node",
     "**/eslint.*",
     "eslint.config.mjs"
   ]

@@ -17,3 +17,4 @@ typings.d.ts
 /.vscode
 /docker
 pnpm-lock.yaml
+eslint.config.mjs

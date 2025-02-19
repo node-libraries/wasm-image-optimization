@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import { optimizeImage } from "../dist/cjs";
+import { optimizeImage } from "../dist/cjs/node";
 
 const formats = ["webp", "jpeg", "png", "avif"] as const;
 

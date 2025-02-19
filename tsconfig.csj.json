@@ -1,7 +1,8 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "CommonJS"
+    "module": "CommonJS",
+    "outDir": "./dist/cjs"
   },
   "exclude": [
     "node_modules",
@@ -9,7 +10,8 @@
     "test",
     "src/workers",
     "src/next",
-    "src/esm/",
+    "src/esm",
+    "src/vite",
     "eslint.config.mjs"
   ]
 }
