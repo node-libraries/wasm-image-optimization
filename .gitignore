@@ -5,4 +5,3 @@ node_modules
 /devel
 /image_output
 .vscode
-pnpm-lock.yaml

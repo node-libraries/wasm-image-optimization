@@ -12,6 +12,7 @@
     "src/next",
     "src/esm",
     "src/vite",
+    "src/webworker",
     "eslint.config.mjs"
   ]
 }

@@ -1,7 +1,15 @@
 {
   "name": "wasm-image-optimization",
   "description": "Optimize images with wasm on edge runtime",
-  "version": "1.1.7",
+  "version": "1.1.8",
+  "imports": {
+    "#wasm": {
+      "browser": "./dist/esm/libImage.wasm"
+    },
+    "#worker": {
+      "browser": "./dist/vite/worker.js"
+    }
+  },
   "exports": {
     "./esm": {
       "default": {
@@ -24,7 +32,17 @@
     "./vite": {
       "default": {
         "types": "./dist/vite/index.d.ts",
-        "default": "./dist/vite/index.js"
+        "browser": "./dist/vite/index.js",
+        "node": "./dist/vite/dummy.js",
+        "default": "./dist/vite/dummy.js"
+      }
+    },
+    "./webworker": {
+      "default": {
+        "types": "./dist/webworker/index.d.ts",
+        "browser": "./dist/webworker/index.js",
+        "node": "./dist/vite/dummy.js",
+        "default": "./dist/vite/dummy.js"
       }
     },
     "./wasm": {
@@ -81,6 +99,9 @@
     "build": "tsc && tsc -p ./tsconfig.csj.json && cpy esm dist",
     "build:wasm": "docker compose -f docker/docker-compose.yml run --build --rm emcc make -j",
     "docker:shell": "docker compose -f docker/docker-compose.yml run --build --rm emcc bash -l"
+  },
+  "dependencies": {
+    "worker-lib": "1.0.2"
   },
   "devDependencies": {
     "@types/node": "^22.13.4",

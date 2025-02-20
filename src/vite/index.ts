@@ -1,4 +1,5 @@
 import WASM from "../esm/libImage.wasm?url";
+
 import {
   _optimizeImage,
   _optimizeImageExt,
@@ -16,8 +17,8 @@ const getLibImage = async () => {
   return libImage;
 };
 
-export const optimizeImage = async (params: OptimizeParams) =>
+export const optimizeImage = (params: OptimizeParams) =>
   _optimizeImage({ ...params, libImage: getLibImage() });
 
-export const optimizeImageExt = async (params: OptimizeParams) =>
+export const optimizeImageExt = (params: OptimizeParams) =>
   _optimizeImageExt({ ...params, libImage: getLibImage() });
