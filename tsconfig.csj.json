@@ -6,12 +6,14 @@
   },
   "exclude": [
     "node_modules",
+    "bin",
     "dist",
     "test",
     "src/workers",
     "src/next",
     "src/esm",
     "src/vite",
+    "src/vite-plugin",
     "src/webworker",
     "eslint.config.mjs"
   ]

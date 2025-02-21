@@ -1,8 +1,6 @@
 /node_modules
 /src
 /test
-/libwebp
-/libavif
 tsconfig.json
 tsconfig.csj.json
 yarn.lock
@@ -18,3 +16,5 @@ typings.d.ts
 /docker
 pnpm-lock.yaml
 eslint.config.mjs
+bin
+dist/esm/_*

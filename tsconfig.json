@@ -94,6 +94,7 @@
     "node_modules",
     "dist",
     "test",
+    "bin",
     "src/node",
     "**/eslint.*",
     "eslint.config.mjs"

@@ -10,7 +10,7 @@ export type OptimizeParams = {
 
 const result = (
   result: ReturnType<ModuleType["optimize"]> | undefined,
-  releaseResult: () => void
+  releaseResult: () => void,
 ) => {
   const r = result
     ? { ...result, data: Uint8Array.from(result.data) }
@@ -29,7 +29,7 @@ export const _optimizeImage = async ({
   libImage: Promise<ModuleType>;
 }) =>
   _optimizeImageExt({ image, width, height, quality, format, libImage }).then(
-    (r) => r?.data
+    (r) => r?.data,
   );
 
 export const _optimizeImageExt = async ({
@@ -43,5 +43,5 @@ export const _optimizeImageExt = async ({
   libImage: Promise<ModuleType>;
 }) =>
   libImage.then(({ optimize, releaseResult }) =>
-    result(optimize(image, width, height, quality, format), releaseResult)
+    result(optimize(image, width, height, quality, format), releaseResult),
   );
