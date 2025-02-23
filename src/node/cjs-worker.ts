@@ -8,7 +8,7 @@ import {
 } from "../lib/optimizeImage.js";
 import type { WorkerType } from "./_node-worker.js";
 
-const { execute, waitAll, close } = createWorker<WorkerType>(() => {
+const { execute, waitAll, close, setLimit } = createWorker<WorkerType>(() => {
   const url = path.resolve(__dirname, "./node-worker.js");
   return new Worker(url);
 });
@@ -19,4 +19,4 @@ export const optimizeImage = async (params: OptimizeParams) =>
 export const optimizeImageExt = async (params: OptimizeParams) =>
   execute("optimizeImageExt", params);
 
-export { waitAll, close };
+export { waitAll, close, setLimit };

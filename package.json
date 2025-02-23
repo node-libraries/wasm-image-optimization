@@ -1,7 +1,7 @@
 {
   "name": "wasm-image-optimization",
   "description": "Optimize images with wasm on edge runtime",
-  "version": "1.1.10",
+  "version": "1.2.0",
   "scripts": {
     "test": "yarn ts-node test",
     "lint:fix": "eslint --fix src/ && prettier -w src",
@@ -32,9 +32,9 @@
       "types": "./dist/vite-plugin/index.d.ts",
       "default": "./dist/vite-plugin/index.js"
     },
-    "./webworker": {
-      "types": "./dist/webworker/index.d.ts",
-      "browser": "./dist/webworker/index.js",
+    "./web-worker": {
+      "types": "./dist/web-worker/index.d.ts",
+      "browser": "./dist/web-worker/index.js",
       "node": "./dist/vite/dummy.js"
     },
     "./node-worker": {
@@ -74,7 +74,10 @@
         "./dist/next/index.d.ts"
       ],
       "webworker": [
-        "./dist/webworker/index.d.ts"
+        "./dist/web-worker/index.d.ts"
+      ],
+      "node-worker": [
+        "./dist/cjs/node/cjs-worker.d.ts"
       ],
       "node": [
         "./dist/cjs/node/index.d.ts"

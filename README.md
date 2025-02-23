@@ -8,12 +8,14 @@
   `import { optimizeImage } from 'wasm-image-optimization/next';`
 - ESM (import base) & Deno Deploy  
   `import { optimizeImage } from 'wasm-image-optimization';`
-- CJS (file base)  
+- Node.js  
   `import { optimizeImage } from 'wasm-image-optimization';`
+- Node.js(Multi thread)  
+  `import { optimizeImage } from 'wasm-image-optimization/node-worker';`
 - Vite (Browser)  
   `import { optimizeImage } from 'wasm-image-optimization/vite';`
 - Web Worker (Browser) Multi process  
-  `import { optimizeImage } from 'wasm-image-optimization/webworker';`
+  `import { optimizeImage } from 'wasm-image-optimization/web-worker';`
 
 ## WebWorker on Vite
 
@@ -68,6 +70,50 @@ optimizeImageExt({
   - avif(default)
 
 ## usage
+
+### Node.js (CLI)
+
+```ts
+import fs from "node:fs";
+import {
+  optimizeImage,
+  waitAll,
+  close,
+} from "wasm-image-optimization/node-worker";
+
+const formats = ["webp", "jpeg", "png", "avif"] as const;
+
+const main = async () => {
+  fs.mkdirSync("./image_output", { recursive: true });
+  const files = fs.readdirSync("./images");
+  for (const file of files) {
+    const image = fs.readFileSync(`./images/${file}`);
+    for (const format of formats) {
+      optimizeImage({
+        image,
+        quality: 100,
+        format,
+        width: 1000,
+      }).then((encoded) => {
+        console.log(
+          !!encoded,
+          file,
+          format,
+          encoded && `${Math.floor(encoded.length / 1024)}KB`
+        );
+        if (encoded) {
+          const fileName = file.split(".")[0];
+          fs.promises.writeFile(`image_output/${fileName}.${format}`, encoded);
+        }
+      });
+    }
+  }
+  await waitAll(); // Wait for all workers to finish before exiting the program.
+  close(); // Close all workers
+  console.log("exit");
+};
+main();
+```
 
 ### Next.js image optimization with Cloudflare
 

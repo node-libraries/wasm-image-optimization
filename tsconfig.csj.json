@@ -15,7 +15,7 @@
     "src/esm",
     "src/vite",
     "src/vite-plugin",
-    "src/webworker",
+    "src/web-worker",
     "eslint.config.mjs"
   ]
 }
