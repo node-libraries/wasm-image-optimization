@@ -5,7 +5,7 @@ import {
   _optimizeImageExt,
   type OptimizeParams,
 } from "../lib/optimizeImage.js";
-import LibImage, { type ModuleType } from "../workers/libImage.js";
+import LibImage, { type ModuleType } from "../cjs/libImage.js";
 
 let libImage: Promise<ModuleType>;
 const getLibImage = async () => {

@@ -3,7 +3,7 @@ import path from "path";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 /* @ts-ignore */
-import LibImage from "../../workers/libImage.js";
+import LibImage from "../../cjs/libImage.js";
 import {
   _optimizeImage,
   _optimizeImageExt,
@@ -12,7 +12,7 @@ import {
 
 const libImage = LibImage({
   wasmBinary: fs.readFileSync(
-    path.resolve(__dirname, "../../esm/libImage.wasm"),
+    path.resolve(__dirname, "../../esm/libImage.wasm")
   ) as never,
 });
 

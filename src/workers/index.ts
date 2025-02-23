@@ -1,4 +1,4 @@
-import LibImage from "./libImage.js";
+import LibImage from "../cjs/libImage.js";
 import WASM from "../esm/libImage.wasm";
 import {
   _optimizeImage,

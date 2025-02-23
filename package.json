@@ -1,7 +1,14 @@
 {
   "name": "wasm-image-optimization",
   "description": "Optimize images with wasm on edge runtime",
-  "version": "1.1.9",
+  "version": "1.1.10",
+  "scripts": {
+    "test": "yarn ts-node test",
+    "lint:fix": "eslint --fix src/ && prettier -w src",
+    "build": "tsc && tsc -p ./tsconfig.csj.json && cpy esm dist && tsx bin/build",
+    "build:wasm": "docker compose -f docker/docker-compose.yml run --build --rm emcc make -j",
+    "docker:shell": "docker compose -f docker/docker-compose.yml run --build --rm emcc bash -l"
+  },
   "exports": {
     "./esm": {
       "import": "./dist/esm/index.js",
@@ -29,6 +36,11 @@
       "types": "./dist/webworker/index.d.ts",
       "browser": "./dist/webworker/index.js",
       "node": "./dist/vite/dummy.js"
+    },
+    "./node-worker": {
+      "types": "./dist/cjs/node/cjs-worker.d.ts",
+      "require": "./dist/cjs/node/cjs-worker.js",
+      "import": "./dist/esm/node/cjs-worker.js"
     },
     ".": {
       "require": {
@@ -61,6 +73,9 @@
       "next": [
         "./dist/next/index.d.ts"
       ],
+      "webworker": [
+        "./dist/webworker/index.d.ts"
+      ],
       "node": [
         "./dist/cjs/node/index.d.ts"
       ],
@@ -73,32 +88,25 @@
     }
   },
   "license": "MIT",
-  "scripts": {
-    "test": "yarn ts-node test",
-    "lint:fix": "eslint --fix src/ && prettier -w src",
-    "build": "tsc && tsc -p ./tsconfig.csj.json && cpy esm dist && tsx bin/build",
-    "build:wasm": "docker compose -f docker/docker-compose.yml run --build --rm emcc make -j",
-    "docker:shell": "docker compose -f docker/docker-compose.yml run --build --rm emcc bash -l"
-  },
   "dependencies": {
-    "worker-lib": "1.0.2"
+    "worker-lib": "1.0.4"
   },
   "devDependencies": {
-    "@eslint/js": "9.20.0",
-    "@types/node": "^22.13.4",
-    "@typescript-eslint/eslint-plugin": "^8.24.0",
-    "@typescript-eslint/parser": "^8.24.0",
+    "@eslint/js": "9.21.0",
+    "@types/node": "22.13.5",
+    "@typescript-eslint/eslint-plugin": "^8.24.1",
+    "@typescript-eslint/parser": "^8.24.1",
     "cpy-cli": "^5.0.0",
     "esbuild": "0.25.0",
-    "eslint": "9.20.1",
+    "eslint": "9.21.0",
     "eslint-config-prettier": "^10.0.1",
-    "eslint-import-resolver-typescript": "^3.8.0",
+    "eslint-import-resolver-typescript": "^3.8.3",
     "eslint-plugin-import": "^2.31.0",
-    "prettier": "^3.5.1",
+    "prettier": "^3.5.2",
     "ts-node": "^10.9.2",
     "tsx": "4.19.3",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.24.0",
+    "typescript-eslint": "^8.24.1",
     "vite": "6.1.1"
   },
   "publishConfig": {

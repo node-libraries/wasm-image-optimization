@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import { optimizeImage } from "../dist/cjs/node";
+import { optimizeImage, waitAll, close } from "../dist/cjs/node/cjs-worker";
 
 const formats = ["webp", "jpeg", "png", "avif"] as const;
 
@@ -32,14 +32,14 @@ const main = async () => {
     const u = new URL(url);
     const file = u.pathname.split("/").pop();
     if (!file) return;
-    await optimizeImage({
+    optimizeImage({
       image: data,
       quality: 100,
       format: "jpeg",
       width: 300,
     }).then(async () => {
       for (const format of formats) {
-        await optimizeImage({
+        optimizeImage({
           image: data,
           quality: 100,
           format,
@@ -60,7 +60,7 @@ const main = async () => {
     const data = await fetch(
       `https://raw.githubusercontent.com/recurser/exif-orientation-examples/master/Landscape_${i}.jpg`
     ).then((res) => res.arrayBuffer());
-    await optimizeImage({
+    optimizeImage({
       image: data,
       quality: 100,
       format: "jpeg",
@@ -72,5 +72,7 @@ const main = async () => {
       }
     });
   }
+  await waitAll();
+  close();
 };
 main();

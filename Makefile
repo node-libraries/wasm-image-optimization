@@ -2,7 +2,7 @@ SHELL=/bin/bash
 WORKDIR=work
 DISTDIR=dist
 ESMDIR=$(DISTDIR)/esm
-WORKERSDIR=$(DISTDIR)/workers
+WORKERSDIR=$(DISTDIR)/cjs
 LIBDIR=libavif/ext
 
 TARGET_ESM_BASE = $(notdir $(basename src/libImage.cpp))
@@ -129,4 +129,4 @@ $(TARGET_WORKERS): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(WORKDI
 
 clean:
 	@echo Cleaning up...
-	@rm -rf $(WORKDIR) $(LIBDIR)/aom_build $(DISTDIR)/esm $(DISTDIR)/workers
+	@rm -rf $(WORKDIR) $(LIBDIR)/aom_build $(ESMDIR) $(WORKERSDIR)

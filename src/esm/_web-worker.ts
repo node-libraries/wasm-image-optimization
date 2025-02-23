@@ -5,7 +5,7 @@ import {
   type OptimizeParams,
 } from "../lib/optimizeImage.js";
 
-const libImage = import("../workers/libImage.js").then((m) => m.default({}));
+const libImage = import("../cjs/libImage.js").then((m) => m.default({}));
 
 const map = initWorker({
   optimizeImage: async (params: OptimizeParams) =>

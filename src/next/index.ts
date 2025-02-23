@@ -1,10 +1,10 @@
+import LibImage from "../cjs/libImage.js";
 import WASM from "../esm/libImage.wasm?module";
 import {
   _optimizeImage,
   _optimizeImageExt,
   type OptimizeParams,
 } from "../lib/optimizeImage.js";
-import LibImage from "../workers/libImage.js";
 
 const libImage = LibImage({
   instantiateWasm: async (imports, receiver) => {

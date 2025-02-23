@@ -4,10 +4,10 @@ import {
   _optimizeImageExt,
   type OptimizeParams,
 } from "../lib/optimizeImage.js";
-import type { WorkerType } from "../esm/_worker.js";
+import type { WorkerType } from "../esm/_web-worker.js";
 
 const execute = createWorker<WorkerType>(
-  () => new Worker(new URL("../esm/worker.js", import.meta.url)),
+  () => new Worker(new URL("../esm/web-worker.js", import.meta.url)),
   5
 );
 
