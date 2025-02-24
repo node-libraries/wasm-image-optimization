@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       worker-lib:
-        specifier: 2.0.0
-        version: 2.0.0
+        specifier: 2.0.2
+        version: 2.0.2
     devDependencies:
       '@eslint/js':
         specifier: 9.21.0
@@ -1680,8 +1680,8 @@ packages:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
 
-  worker-lib@2.0.0:
-    resolution: {integrity: sha512-ackJlCfVeCeJDugvl3Yp8w3JHWhESTzipuvTOsWG29AXhBEydLuyXybbvuX/upqATlphOP9zj3MYxqe3ooKf3A==}
+  worker-lib@2.0.2:
+    resolution: {integrity: sha512-pGS4G2jL7CBCGmj5/iBZsCXy1Xrhhsj6ve9plyaBTavTeegQDL3Ymi/D3XlMBBQ1xp4K7+XQML2HKXrjsXiW6Q==}
 
   yn@3.1.1:
     resolution: {integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==}
@@ -3363,7 +3363,7 @@ snapshots:
 
   word-wrap@1.2.5: {}
 
-  worker-lib@2.0.0: {}
+  worker-lib@2.0.2: {}
 
   yn@3.1.1: {}
 
