@@ -6,7 +6,7 @@ import {
 } from "../lib/optimizeImage.js";
 import type { WorkerType } from "../esm/_web-worker.js";
 
-const execute = createWorker<WorkerType>(
+const { execute, setLimit, close } = createWorker<WorkerType>(
   () => new Worker(new URL("../esm/web-worker.js", import.meta.url)),
   5
 );
@@ -16,3 +16,5 @@ export const optimizeImage = async (params: OptimizeParams) =>
 
 export const optimizeImageExt = async (params: OptimizeParams) =>
   execute("optimizeImageExt", params);
+
+export { setLimit, close };

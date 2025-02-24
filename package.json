@@ -1,7 +1,7 @@
 {
   "name": "wasm-image-optimization",
   "description": "Optimize images with wasm on edge runtime",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "scripts": {
     "test": "yarn ts-node test",
     "lint:fix": "eslint --fix src/ && prettier -w src",
@@ -40,7 +40,7 @@
     "./node-worker": {
       "types": "./dist/cjs/node/cjs-worker.d.ts",
       "require": "./dist/cjs/node/cjs-worker.js",
-      "import": "./dist/esm/node/cjs-worker.js"
+      "import": "./dist/cjs/node/cjs-worker.js"
     },
     ".": {
       "require": {
@@ -92,7 +92,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "worker-lib": "1.0.4"
+    "worker-lib": "2.0.0"
   },
   "devDependencies": {
     "@eslint/js": "9.21.0",
