@@ -54,6 +54,14 @@ export default defineConfig(() => ({
 }));
 ```
 
+## Next.js on Backend API
+
+```ts
+import { optimizeImage } from "wasm-image-optimization";
+…
+export const runtime = "edge";
+```
+
 ## function
 
 ```ts

@@ -1,5 +1,4 @@
-import { Worker } from "node:worker_threads";
-import { createWorker } from "worker-lib/node";
+import { createWorker } from "worker-lib";
 import {
   _optimizeImage,
   _optimizeImageExt,
@@ -7,9 +6,10 @@ import {
 } from "../lib/optimizeImage.js";
 import type { WorkerType } from "./_web-worker.js";
 
-const { execute, waitAll, close } = createWorker<WorkerType>(() => {
-  return new Worker(new URL("./web-worker.js", import.meta.url));
-});
+const { execute, setLimit, close } = createWorker<WorkerType>(
+  () => new Worker(new URL("../esm/vite-web-worker.js", import.meta.url)),
+  5
+);
 
 export const optimizeImage = async (params: OptimizeParams) =>
   execute("optimizeImage", params);
@@ -17,4 +17,4 @@ export const optimizeImage = async (params: OptimizeParams) =>
 export const optimizeImageExt = async (params: OptimizeParams) =>
   execute("optimizeImageExt", params);
 
-export { waitAll, close };
+export { setLimit, close };

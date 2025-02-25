@@ -1,16 +1,10 @@
-import LibImage from "../cjs/libImage.js";
-import WASM from "../esm/libImage.wasm?module";
 import {
   _optimizeImage,
   _optimizeImageExt,
   type OptimizeParams,
 } from "../lib/optimizeImage.js";
 
-const libImage = LibImage({
-  instantiateWasm: async (imports, receiver) => {
-    receiver(await WebAssembly.instantiate(WASM, imports));
-  },
-});
+const libImage = import("../esm/libImage.js").then((m) => m.default({}));
 
 export const optimizeImage = async (params: OptimizeParams) =>
   _optimizeImage({ ...params, libImage });
