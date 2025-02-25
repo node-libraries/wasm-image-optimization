@@ -15,9 +15,10 @@
       "types": "./dist/esm/index.d.ts"
     },
     "./next": {
+      "types": "./dist/next-web-worker/index.d.ts",
       "browser": "./dist/next-web-worker/index.js",
       "edge-light": "./dist/esm/index.js",
-      "types": "./dist/next-web-worker/index.d.ts"
+      "default": "./dist/vite/dummy.js"
     },
     "./node": {
       "types": "./dist/cjs/node/index.d.ts",
@@ -72,7 +73,7 @@
         "./dist/esm/index.d.ts"
       ],
       "next": [
-        "./dist/next/index.d.ts"
+        "./dist/next-web-worker/index.d.ts"
       ],
       "web-worker": [
         "./dist/vite-web-worker/index.d.ts"
