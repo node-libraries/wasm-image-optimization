@@ -114,7 +114,7 @@ void releaseResult()
     memoryManager.release();
 }
 
-val optimize(std::string img_in, float width, float height, float quality, std::string format)
+val optimize(std::string img_in, float width, float height, float quality, std::string format, int speed = 6)
 {
     int orientation = getOrientation(img_in);
     Bitmap bitmap;
@@ -276,7 +276,7 @@ val optimize(std::string img_in, float width, float height, float quality, std::
             }
             avifEncoder *encoder = avifEncoderCreate();
             encoder->quality = (int)((quality) / 100 * 63);
-            encoder->speed = 6;
+            encoder->speed = speed;
 
             avifRWData raw = AVIF_DATA_EMPTY;
 

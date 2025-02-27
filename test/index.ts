@@ -13,7 +13,8 @@ const main = async () => {
         image: data,
         quality: 100,
         format,
-        width: 100,
+        width: 500,
+        speed: 6,
       }).then((encoded) => {
         console.log(encoded ? true : false, file, format);
         if (encoded) {
@@ -37,6 +38,7 @@ const main = async () => {
       quality: 100,
       format: "jpeg",
       width: 300,
+      speed: 6,
     }).then(async () => {
       for (const format of formats) {
         optimizeImage({

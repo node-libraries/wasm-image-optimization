@@ -71,8 +71,10 @@ optimizeImage({
   width?: number,
   height?:number,
   quality?: number, // quality: 1-100
-  format?: "png" | "jpeg" | "avif" | "webp"})
-    :Promise<
+  format?: "png" | "jpeg" | "avif" | "webp"}
+  speed?: number // avif-speed: 0-10 (Slow-Fast, default: 6)
+  ):
+    Promise<
       ArrayBuffer>
 
 optimizeImageExt({
@@ -80,8 +82,10 @@ optimizeImageExt({
   width?: number,
   height?:number,
   quality?: number,
-  format?: "png" | "jpeg" | "avif" | "webp"})
-    :Promise<{
+  format?: "png" | "jpeg" | "avif" | "webp"}
+  speed?: number // avif-speed: 0-10 (Slow-Fast, default: 6)
+  ):
+    Promise<{
       data: Uint8Array;
       originalWidth: number;
       originalHeight: number;
