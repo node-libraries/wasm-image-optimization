@@ -16,7 +16,7 @@ CFLAGS = -O3 -msimd128 -sSTACK_SIZE=5MB \
 
 CFLAGS_ASM = --bind \
              -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s ENVIRONMENT=web -s DYNAMIC_EXECUTION=0 -s MODULARIZE=1 \
-             -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_GFX=2 \
+             -s USE_SDL=3 -s USE_SDL_IMAGE=2 -s USE_SDL_GFX=2 \
              -s SDL2_IMAGE_FORMATS='["png","jpg","webp","svg","avif"]'
 
 WEBP_SOURCES := $(wildcard libwebp/src/dsp/*.c) \
@@ -42,6 +42,7 @@ AVIF_SOURCES := libavif/src/alpha.c \
                 libavif/src/stream.c \
                 libavif/src/utils.c \
                 libavif/src/write.c \
+                libavif/src/gainmap.c \
                 libavif/src/codec_aom.c \
                 libavif/third_party/libyuv/source/scale.c \
                 libavif/third_party/libyuv/source/scale_common.c \
@@ -76,7 +77,7 @@ $(SVG_OBJECTS): %.o: %.cpp
 
 $(LIBDIR)/aom_build/libaom.a:
 	@echo Building aom...
-	@cd $(LIBDIR) && ./aom.cmd && mkdir aom_build && cd aom_build && \
+	@cd $(LIBDIR) && ./aom.cmd && mkdir -p aom_build && cd aom_build && \
 	emcmake cmake ../aom \
     -DENABLE_CCACHE=1 \
     -DAOM_TARGET_CPU=generic \

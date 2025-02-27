@@ -4,7 +4,7 @@
 #include <webp/encode.h>
 #include <SDL2/SDL2_rotozoom.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 #include <libexif/exif-data.h>
 #include <avif/avif.h>
 #include <lunasvg.h>
