@@ -4,12 +4,12 @@ import path from "path";
 /* @ts-ignore */
 import LibImage from "../../cjs/libImage.js";
 import { _optimizeImage, _optimizeImageExt } from "../lib/optimizeImage.js";
-import type { OptimizeParams, OptimizeResult } from "../esm/libImage.js";
+import type { OptimizeParams, OptimizeResult } from "../types/index.js";
 export type { OptimizeParams, OptimizeResult };
 
 const libImage = LibImage({
   wasmBinary: fs.readFileSync(
-    path.resolve(__dirname, "../../esm/libImage.wasm")
+    path.resolve(__dirname, "../../esm/libImage.wasm"),
   ) as never,
 });
 

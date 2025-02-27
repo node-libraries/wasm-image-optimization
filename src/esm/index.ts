@@ -1,9 +1,6 @@
-import LibImage, {
-  type OptimizeParams,
-  type OptimizeResult,
-} from "./libImage.js";
+import LibImage from "./libImage.js";
 import { _optimizeImage, _optimizeImageExt } from "../lib/optimizeImage.js";
-
+import type { OptimizeParams, OptimizeResult } from "../types/index.js";
 export type { OptimizeParams, OptimizeResult };
 
 const libImage = LibImage();

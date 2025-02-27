@@ -25,7 +25,7 @@ export default (): Plugin[] => {
       writeBundle() {
         fs.copyFileSync(
           "node_modules/wasm-image-optimization/dist/esm/libImage.wasm",
-          path.resolve(config.build.outDir, "assets/libImage.wasm")
+          path.resolve(config.build.outDir, "assets/libImage.wasm"),
         );
       },
     },

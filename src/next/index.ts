@@ -1,5 +1,5 @@
 import { _optimizeImage, _optimizeImageExt } from "../lib/optimizeImage.js";
-import type { OptimizeParams, OptimizeResult } from "../esm/libImage.js";
+import type { OptimizeParams, OptimizeResult } from "../types/index.js";
 export type { OptimizeParams, OptimizeResult };
 
 const libImage = import("../esm/libImage.js").then((m) => m.default({}));

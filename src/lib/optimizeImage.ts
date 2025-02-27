@@ -1,8 +1,9 @@
-import type { ModuleType, OptimizeParams, OptimizeResult } from "../esm/libImage.js";
+import type { ModuleType } from "../esm/libImage.js";
+import type { OptimizeParams } from "../types/index.js";
 
 const result = (
   result: ReturnType<ModuleType["optimize"]> | undefined,
-  releaseResult: () => void
+  releaseResult: () => void,
 ) => {
   const r = result
     ? { ...result, data: Uint8Array.from(result.data) }
@@ -45,6 +46,6 @@ export const _optimizeImageExt = async ({
   libImage.then(({ optimize, releaseResult }) =>
     result(
       optimize(image, width, height, quality, format, speed),
-      releaseResult
-    )
+      releaseResult,
+    ),
   );
