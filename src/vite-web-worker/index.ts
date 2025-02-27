@@ -1,10 +1,8 @@
 import { createWorker } from "worker-lib";
-import {
-  _optimizeImage,
-  _optimizeImageExt,
-  type OptimizeParams,
-} from "../lib/optimizeImage.js";
+import { _optimizeImage, _optimizeImageExt } from "../lib/optimizeImage.js";
 import type { WorkerType } from "./_web-worker.js";
+import type { OptimizeParams, OptimizeResult } from "../esm/libImage.js";
+export type { OptimizeParams, OptimizeResult };
 
 const { execute, setLimit, close } = createWorker<WorkerType>(
   () => new Worker(new URL("../esm/vite-web-worker.js", import.meta.url)),

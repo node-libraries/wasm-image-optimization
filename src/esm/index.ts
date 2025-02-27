@@ -1,9 +1,10 @@
-import LibImage from "./libImage.js";
-import {
-  _optimizeImage,
-  _optimizeImageExt,
+import LibImage, {
   type OptimizeParams,
-} from "../lib/optimizeImage.js";
+  type OptimizeResult,
+} from "./libImage.js";
+import { _optimizeImage, _optimizeImageExt } from "../lib/optimizeImage.js";
+
+export type { OptimizeParams, OptimizeResult };
 
 const libImage = LibImage();
 

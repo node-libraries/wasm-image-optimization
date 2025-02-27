@@ -1,14 +1,11 @@
 import fs from "fs";
 import path from "path";
-
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 /* @ts-ignore */
 import LibImage from "../../cjs/libImage.js";
-import {
-  _optimizeImage,
-  _optimizeImageExt,
-  type OptimizeParams,
-} from "../lib/optimizeImage.js";
+import { _optimizeImage, _optimizeImageExt } from "../lib/optimizeImage.js";
+import type { OptimizeParams, OptimizeResult } from "../esm/libImage.js";
+export type { OptimizeParams, OptimizeResult };
 
 const libImage = LibImage({
   wasmBinary: fs.readFileSync(

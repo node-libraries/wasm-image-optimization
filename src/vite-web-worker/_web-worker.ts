@@ -1,9 +1,6 @@
 import { initWorker } from "worker-lib";
-import {
-  _optimizeImage,
-  _optimizeImageExt,
-  type OptimizeParams,
-} from "../lib/optimizeImage.js";
+import { _optimizeImage, _optimizeImageExt } from "../lib/optimizeImage.js";
+import type { OptimizeParams } from "../esm/libImage.js";
 
 const libImage = import("../cjs/libImage.js").then((m) => m.default({}));
 

@@ -1,13 +1,4 @@
-import { type ModuleType } from "../esm/libImage.js";
-
-export type OptimizeParams = {
-  image: BufferSource | string; // The input image data
-  width?: number; // The desired output width (optional)
-  height?: number; // The desired output height (optional)
-  quality?: number; // The desired output quality (0-100, optional)
-  format?: "jpeg" | "png" | "webp" | "avif"; // The desired output format (optional)
-  speed?: number; // The desired speed (0-10, Slow-Fast, Optional)
-};
+import type { ModuleType, OptimizeParams, OptimizeResult } from "../esm/libImage.js";
 
 const result = (
   result: ReturnType<ModuleType["optimize"]> | undefined,

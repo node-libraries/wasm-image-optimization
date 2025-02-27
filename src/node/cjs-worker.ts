@@ -1,12 +1,9 @@
 import path from "node:path";
 import { Worker } from "node:worker_threads";
 import { createWorker } from "worker-lib/node";
-import {
-  _optimizeImage,
-  _optimizeImageExt,
-  type OptimizeParams,
-} from "../lib/optimizeImage.js";
+import { _optimizeImage, _optimizeImageExt } from "../lib/optimizeImage.js";
 import type { WorkerType } from "./_node-worker.js";
+import type { OptimizeParams } from "./index.js";
 
 const { execute, waitAll, close, setLimit } = createWorker<WorkerType>(() => {
   const url = path.resolve(__dirname, "./node-worker.js");
