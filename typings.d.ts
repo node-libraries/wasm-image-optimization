@@ -1,10 +1,10 @@
 declare module "*.wasm" {
-  const content: never;
+  const content: any;
   export default content;
 }
 
 declare module "*.wasm?module" {
-  const content: never;
+  const content: any;
   export default content;
 }
 
@@ -16,6 +16,6 @@ declare module "*.wasm?init" {
 }
 
 declare module "*.wasm?url" {
-  const content: never;
+  const content: any;
   export default content;
 }

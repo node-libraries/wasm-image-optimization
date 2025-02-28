@@ -12,6 +12,7 @@
     "test",
     "src/workers",
     "src/next",
+    "src/next-back",
     "src/esm",
     "src/vite",
     "src/vite-plugin",

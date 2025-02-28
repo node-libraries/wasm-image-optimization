@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { optimizeImage, waitAll, close } from "../dist/cjs/node/cjs-worker";
 
-const formats = ["webp", "jpeg", "png", "avif"] as const;
+const formats = ["webp", "jpeg", "png", "avif", "none"] as const;
 
 const main = async () => {
   fs.mkdirSync("./image_output", { recursive: true });
@@ -18,8 +18,12 @@ const main = async () => {
       }).then((encoded) => {
         console.log(encoded ? true : false, file, format);
         if (encoded) {
-          const fileName = file.split(".")[0];
-          fs.writeFileSync(`image_output/${fileName}.${format}`, encoded);
+          const fileName = file.split(".");
+          const filePath =
+            format === "none"
+              ? `image_output/${fileName[0]}_.${fileName[1]}`
+              : `image_output/${fileName[0]}.${format}`;
+          fs.writeFileSync(filePath, encoded);
         }
       });
     }
@@ -50,8 +54,12 @@ const main = async () => {
         }).then((encoded) => {
           console.log(encoded ? true : false, file, format);
           if (encoded) {
-            const fileName = file.split(".")[0];
-            fs.writeFileSync(`image_output/${fileName}.${format}`, encoded);
+            const fileName = file.split(".");
+            const filePath =
+              format === "none"
+                ? `image_output/${fileName[0]}_.${fileName[1]}`
+                : `image_output/${fileName[0]}.${format}`;
+            fs.writeFileSync(filePath, encoded);
           }
         });
       }

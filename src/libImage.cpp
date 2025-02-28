@@ -152,6 +152,11 @@ val optimize(std::string img_in, float width, float height, float quality, std::
         SDL_FreeSurface(srcSurface);
         return val::null();
     }
+    if (format == "none")
+    {
+        val result = createResult(img_in.size(), (const uint8_t *)img_in.c_str(), srcWidth, srcHeight, srcWidth, srcHeight);
+        return result;
+    }
 
     int outWidth = width ? width : srcWidth;
     int outHeight = height ? height : srcHeight;
