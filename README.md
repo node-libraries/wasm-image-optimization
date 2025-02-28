@@ -1,6 +1,37 @@
 # wasm-image-optimization
 
-## function
+WebAssembly is used to provide image transformation functionality.
+
+- Frontend
+
+  - Next.js (Multithreading support)
+  - React Router (Multithreading support)
+
+- Backend
+
+  - Cloudflare Workers
+  - Deno Deploy
+  - Node.js (Multithreading support)
+
+- Convert
+  - source format
+    - svg
+    - jpeg (EXIF orientation is supported)
+    - png
+    - webp
+    - avif
+  - output format
+    - jpeg
+    - png
+    - webp
+    - avif (default)
+
+## Example
+
+https://next-image-convert.vercel.app/  
+![](https://raw.githubusercontent.com/node-libraries/wasm-image-optimization/refs/heads/master/doc/image.avif)
+
+## Functions
 
 ```ts
 optimizeImage({
@@ -31,19 +62,9 @@ optimizeImageExt({
 
 ```
 
-- source format
-  - svg
-  - jpeg(EXIF orientation is supported)
-  - png
-  - webp
-  - avif
-- output format
-  - jpeg
-  - png
-  - webp
-  - avif(default)
-
 ## WebWorker on Vite
+
+To use Vite, the following settings are required
 
 - vite.config.ts
 
@@ -75,24 +96,3 @@ export default defineConfig(() => ({
 ## Samples
 
 https://github.com/SoraKumo001/wasm-image-optimization-samples
-
-### cloudflare-ogp
-
-Sample for generating OGP images on Cloudflare Workers.
-
-### deno-ogp
-
-Sample for generating OGP images on Deno.
-
-### cloudflare-image-optimization
-
-Sample for image optimization on Cloudflare Workers.
-
-### deno-image-optimization
-
-Sample for image optimization on Deno.
-
-### node-image-convert
-
-Sample for converting image formats on Node.js.  
-Single-threaded and multi-threaded operation can be selected.
