@@ -1,5 +1,60 @@
 # wasm-image-optimization
 
+## function
+
+```ts
+optimizeImage({
+  image: ArrayBuffer,
+  width?: number,
+  height?:number,
+  quality?: number, // quality: 1-100
+  format?: "png" | "jpeg" | "avif" | "webp" | "none"}
+  speed?: number // avif-speed: 0-10 (Slow-Fast, default: 6)
+  ):
+    Promise<
+      ArrayBuffer>
+
+optimizeImageExt({
+  image: ArrayBuffer,
+  width?: number,
+  height?:number,
+  quality?: number,
+  format?: "png" | "jpeg" | "avif" | "webp" | "none"}
+  speed?: number // avif-speed: 0-10 (Slow-Fast, default: 6)
+  ):
+    Promise<{
+      data: Uint8Array,
+      originalWidth: number,
+      originalHeight: number,
+      width: number,
+      height: number}>
+
+```
+
+- source format
+  - svg
+  - jpeg(EXIF orientation is supported)
+  - png
+  - webp
+  - avif
+- output format
+  - jpeg
+  - png
+  - webp
+  - avif(default)
+
+## WebWorker on Vite
+
+- vite.config.ts
+
+```ts
+import wasmImageOptimizationPlugin from "wasm-image-optimization/vite-plugin";
+
+export default defineConfig(() => ({
+  plugins: [wasmImageOptimizationPlugin()],
+}));
+```
+
 ## Supported Environments
 
 - Cloudflare workers  
@@ -41,67 +96,3 @@ Sample for image optimization on Deno.
 
 Sample for converting image formats on Node.js.  
 Single-threaded and multi-threaded operation can be selected.
-
-## WebWorker on Vite
-
-- vite.config.ts
-
-```ts
-import wasmImageOptimizationPlugin from "wasm-image-optimization/vite-plugin";
-
-export default defineConfig(() => ({
-  plugins: [wasmImageOptimizationPlugin()],
-}));
-```
-
-## Next.js on Backend API
-
-```ts
-import { optimizeImage } from "wasm-image-optimization";
-…
-export const runtime = "edge";
-```
-
-## function
-
-```ts
-
-optimizeImage({
-  image: ArrayBuffer,
-  width?: number,
-  height?:number,
-  quality?: number, // quality: 1-100
-  format?: "png" | "jpeg" | "avif" | "webp"}
-  speed?: number // avif-speed: 0-10 (Slow-Fast, default: 6)
-  ):
-    Promise<
-      ArrayBuffer>
-
-optimizeImageExt({
-  image: ArrayBuffer,
-  width?: number,
-  height?:number,
-  quality?: number,
-  format?: "png" | "jpeg" | "avif" | "webp"}
-  speed?: number // avif-speed: 0-10 (Slow-Fast, default: 6)
-  ):
-    Promise<{
-      data: Uint8Array;
-      originalWidth: number;
-      originalHeight: number;
-      width: number;
-      height: number;}>
-
-```
-
-- source format
-  - svg
-  - jpeg(EXIF orientation is supported)
-  - png
-  - webp
-  - avif
-- output format
-  - jpeg
-  - png
-  - webp
-  - avif(default)
