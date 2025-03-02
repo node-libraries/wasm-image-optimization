@@ -4,10 +4,11 @@ import type { WorkerType } from "./_web-worker.js";
 import type { OptimizeParams, OptimizeResult } from "../types/index.js";
 export type { OptimizeParams, OptimizeResult };
 
-const { execute, setLimit, close } = createWorker<WorkerType>(
-  () => new Worker(new URL("../esm/vite-web-worker.js", import.meta.url)),
-  5,
-);
+const { execute, setLimit, close, waitAll, waitReady } =
+  createWorker<WorkerType>(
+    () => new Worker(new URL("../esm/vite-web-worker.js", import.meta.url)),
+    5
+  );
 
 export const optimizeImage = async (params: OptimizeParams) =>
   execute("optimizeImage", params);
@@ -15,4 +16,4 @@ export const optimizeImage = async (params: OptimizeParams) =>
 export const optimizeImageExt = async (params: OptimizeParams) =>
   execute("optimizeImageExt", params);
 
-export { setLimit, close };
+export { setLimit, close, waitAll, waitReady };

@@ -33,6 +33,8 @@ https://next-image-convert.vercel.app/
 
 ## Functions
 
+- Convert image
+
 ```ts
 optimizeImage({
   image: ArrayBuffer,
@@ -60,6 +62,14 @@ optimizeImageExt({
       width: number,
       height: number}>
 
+```
+
+- Multi Threading
+
+```ts
+waitAll(): Promise<void>
+waitReady(retryTime?: number) :Promise<void>
+close():void;
 ```
 
 ## WebWorker on Vite
