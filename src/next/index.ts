@@ -1,11 +1,12 @@
 import LibImage from "../cjs/libImage.js";
 import { _optimizeImage, _optimizeImageExt } from "../lib/optimizeImage.js";
-import type { OptimizeParams } from "../types/index.js";
+import type { OptimizeParams, OptimizeResult } from "../types/index.js";
+export type { OptimizeParams, OptimizeResult };
 
 const getLibImage = async () =>
   LibImage({
     wasmBinary: await fetch(
-      "https://cdn.jsdelivr.net/npm/wasm-image-optimization@1.2.18/dist/esm/libImage.wasm"
+      "https://cdn.jsdelivr.net/npm/wasm-image-optimization@1.2.18/dist/esm/libImage.wasm",
     ).then((v) => v.arrayBuffer()),
   });
 

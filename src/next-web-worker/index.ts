@@ -7,7 +7,7 @@ export type { OptimizeParams, OptimizeResult };
 const { execute, setLimit, close, waitAll, waitReady } =
   createWorker<WorkerType>(
     () => new Worker(new URL("../esm/next-web-worker.js", import.meta.url)),
-    5
+    5,
   );
 
 export const optimizeImage = async (params: OptimizeParams) =>

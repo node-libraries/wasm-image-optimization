@@ -3,7 +3,8 @@ import { Worker } from "node:worker_threads";
 import { createWorker } from "worker-lib/node";
 import { _optimizeImage, _optimizeImageExt } from "../lib/optimizeImage.js";
 import type { WorkerType } from "./_node-worker.js";
-import type { OptimizeParams } from "./index.js";
+import type { OptimizeParams, OptimizeResult } from "../types/index.js";
+export type { OptimizeParams, OptimizeResult };
 
 const { execute, waitAll, waitReady, close, setLimit } =
   createWorker<WorkerType>(() => {

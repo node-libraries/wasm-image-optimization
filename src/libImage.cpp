@@ -80,23 +80,6 @@ private:
     std::vector<uint8_t> m_buffer;
 };
 
-int getOrientation(std::string img)
-{
-    int orientation = 1;
-    ExifData *ed = exif_data_new_from_data((const unsigned char *)img.c_str(), img.size());
-    if (!ed)
-    {
-        return orientation;
-    }
-    ExifEntry *entry = exif_content_get_entry(ed->ifd[EXIF_IFD_0], EXIF_TAG_ORIENTATION);
-    if (entry)
-    {
-        orientation = exif_get_short(entry->data, exif_data_get_byte_order(entry->parent->parent));
-    }
-    exif_data_unref(ed);
-    return orientation;
-}
-
 val createResult(size_t size, const uint8_t *data, float originalWidth, float originalHeight, float width, float height)
 {
     uint8_t *ptr = memoryManager.allocate(data, size);
@@ -114,105 +97,163 @@ void releaseResult()
     memoryManager.release();
 }
 
-val optimize(std::string img_in, float width, float height, float quality, std::string format, int speed = 6)
+class Image
 {
-    int orientation = getOrientation(img_in);
-    Bitmap bitmap;
-    SDL_RWops *rw = SDL_RWFromConstMem(img_in.c_str(), img_in.size());
-    if (!rw)
+private:
+    float m_width;
+    float m_height;
+    int m_orientation;
+    SDL_RWops *m_rw;
+    std::string *m_img;
+    float m_srcWidth;
+    float m_srcHeight;
+    lunasvg::Bitmap m_bitmap;
+
+public:
+    Image(std::string &img, float width, float height)
     {
-        return val::null();
+        m_width = width;
+        m_height = height;
+        m_orientation = getOrientation(img.c_str(), img.size());
+        m_rw = SDL_RWFromConstMem(img.c_str(), img.size());
+        m_img = &img;
     }
-    SDL_Surface *srcSurface;
-    if (IMG_isSVG(rw))
+    ~Image()
     {
-        auto document = Document::loadFromData(img_in.c_str(), img_in.length());
-        if (!document.get())
-            return val::null();
-        bitmap = document->renderToBitmap(width == 0 ? -1 : width, height == 0 ? -1 : height);
-        bitmap.convertToRGBA();
-        if (bitmap.isNull())
-            return val::null();
-        srcSurface = SDL_CreateRGBSurfaceWithFormatFrom(bitmap.data(), bitmap.width(), bitmap.height(), 32, bitmap.stride(), SDL_PIXELFORMAT_RGBA32);
+        if (m_rw)
+            SDL_FreeRW(m_rw);
     }
-    else
+    int getOrientation(const char *data, size_t size)
     {
-        srcSurface = IMG_Load_RW(rw, 1);
-    }
-    SDL_FreeRW(rw);
-    if (!srcSurface)
-    {
-        return val::null();
+        int orientation = 1;
+        ExifData *ed = exif_data_new_from_data((const unsigned char *)data, size);
+        if (!ed)
+        {
+            return orientation;
+        }
+        ExifEntry *entry = exif_content_get_entry(ed->ifd[EXIF_IFD_0], EXIF_TAG_ORIENTATION);
+        if (entry)
+        {
+            orientation = exif_get_short(entry->data, exif_data_get_byte_order(entry->parent->parent));
+        }
+        exif_data_unref(ed);
+        return orientation;
     }
 
-    int srcWidth = srcSurface->w;
-    int srcHeight = srcSurface->h;
-    if (srcWidth == 0 || srcHeight == 0)
+    SDL_Surface *getSurface(bool convert)
     {
+        if (!m_rw)
+        {
+            return nullptr;
+        }
+        SDL_Surface *srcSurface;
+        if (IMG_isSVG(m_rw))
+        {
+            auto document = Document::loadFromData(m_img->c_str(), m_img->length());
+            if (!document.get())
+                return nullptr;
+            m_bitmap = document->renderToBitmap(m_width ? m_width : -1, m_height ? m_height : -1);
+            m_bitmap.convertToRGBA();
+            if (m_bitmap.isNull())
+                return nullptr;
+            srcSurface = SDL_CreateRGBSurfaceWithFormatFrom(m_bitmap.data(), m_bitmap.width(), m_bitmap.height(), 32, m_bitmap.stride(), SDL_PIXELFORMAT_RGBA32);
+        }
+        else
+        {
+            srcSurface = IMG_Load_RW(m_rw, 1);
+        }
+        m_srcWidth = srcSurface->w;
+        m_srcHeight = srcSurface->h;
+        if (!convert)
+            return srcSurface;
+
+        if (m_srcWidth == 0 || m_srcHeight == 0)
+        {
+            SDL_FreeSurface(srcSurface);
+            return nullptr;
+        }
+
+        int outWidth = m_width ? m_width : m_srcWidth;
+        int outHeight = m_height ? m_height : m_srcHeight;
+        float aspectSrc = static_cast<float>(m_srcWidth) / m_srcHeight;
+        float aspectDest = outWidth / outHeight;
+
+        if (aspectSrc > aspectDest)
+        {
+            outHeight = outWidth / aspectSrc;
+        }
+        else
+        {
+            outWidth = outHeight * aspectSrc;
+        }
+
+        SDL_Surface *newSurface = zoomSurface(srcSurface, (float)outWidth / m_srcWidth, (float)outHeight / m_srcHeight, SMOOTHING_ON);
         SDL_FreeSurface(srcSurface);
+        if (!newSurface)
+        {
+            return nullptr;
+        }
+
+        if (m_orientation > 1)
+        {
+            double angle = 0;
+            double x = 1;
+            double y = 1;
+            switch (m_orientation)
+            {
+            case 2:
+                x = -1.0;
+                break;
+            case 3:
+                angle = 180.0;
+                break;
+            case 4:
+                y = -1.0;
+                break;
+            case 5:
+                angle = 90.0;
+                x = -1.0;
+                break;
+            case 6:
+                angle = 270.0;
+                break;
+            case 7:
+                angle = 270.0;
+                x = -1.0;
+                break;
+            case 8:
+                angle = 90.0;
+                break;
+            }
+            SDL_Surface *rotatedSurface = rotozoomSurfaceXY(newSurface, angle, x, y, SMOOTHING_ON);
+            SDL_FreeSurface(newSurface);
+            newSurface = rotatedSurface;
+        }
+        return newSurface;
+    }
+    float getSrcWidth() const
+    {
+        return m_srcWidth;
+    }
+    float getSrcHeight() const
+    {
+        return m_srcHeight;
+    }
+};
+
+val optimize(std::string img_in, float width, float height, float quality, std::string format, int speed = 6)
+{
+    Image image(img_in, width, height);
+    auto surface = image.getSurface(format != "none");
+    if (!surface)
+    {
         return val::null();
     }
     if (format == "none")
     {
-        val result = createResult(img_in.size(), (const uint8_t *)img_in.c_str(), srcWidth, srcHeight, srcWidth, srcHeight);
+        val result = createResult(img_in.size(), (const uint8_t *)img_in.c_str(), surface->w, surface->h, surface->w, surface->h);
+        SDL_FreeSurface(surface);
         return result;
-    }
-
-    int outWidth = width ? width : srcWidth;
-    int outHeight = height ? height : srcHeight;
-    float aspectSrc = static_cast<float>(srcWidth) / srcHeight;
-    float aspectDest = outWidth / outHeight;
-
-    if (aspectSrc > aspectDest)
-    {
-        outHeight = outWidth / aspectSrc;
-    }
-    else
-    {
-        outWidth = outHeight * aspectSrc;
-    }
-
-    SDL_Surface *newSurface = zoomSurface(srcSurface, (float)outWidth / srcWidth, (float)outHeight / srcHeight, SMOOTHING_ON);
-    SDL_FreeSurface(srcSurface);
-    if (!newSurface)
-    {
-        return val::null();
-    }
-
-    if (orientation > 1)
-    {
-        double angle = 0;
-        double x = 1;
-        double y = 1;
-        switch (orientation)
-        {
-        case 2:
-            x = -1.0;
-            break;
-        case 3:
-            angle = 180.0;
-            break;
-        case 4:
-            y = -1.0;
-            break;
-        case 5:
-            angle = 90.0;
-            x = -1.0;
-            break;
-        case 6:
-            angle = 270.0;
-            break;
-        case 7:
-            angle = 270.0;
-            x = -1.0;
-            break;
-        case 8:
-            angle = 90.0;
-            break;
-        }
-        SDL_Surface *rotatedSurface = rotozoomSurfaceXY(newSurface, angle, x, y, SMOOTHING_ON);
-        SDL_FreeSurface(newSurface);
-        newSurface = rotatedSurface;
     }
 
     if (format == "png" || format == "jpeg")
@@ -220,62 +261,63 @@ val optimize(std::string img_in, float width, float height, float quality, std::
         MemoryRW memoryRW;
         if (format == "png")
         {
-            IMG_SavePNG_RW(newSurface, memoryRW, 1);
+            IMG_SavePNG_RW(surface, memoryRW, 1);
         }
         else
         {
-            IMG_SaveJPG_RW(newSurface, memoryRW, 1, quality);
+            IMG_SaveJPG_RW(surface, memoryRW, 1, quality);
         }
-        SDL_FreeSurface(newSurface);
+        SDL_FreeSurface(surface);
         val result = val::null();
         if (memoryRW.size())
         {
-            result = createResult(memoryRW.size(), memoryRW.data(), srcWidth, srcHeight, outWidth, outHeight);
+            result = createResult(memoryRW.size(), memoryRW.data(), image.getSrcWidth(), image.getSrcHeight(), surface->w, surface->h);
         }
         return result;
     }
     else
     {
-        if (newSurface->format->format != SDL_PIXELFORMAT_RGBA32)
+        if (surface->format->format != SDL_PIXELFORMAT_RGBA32)
         {
-            SDL_Surface *convertedSurface = SDL_ConvertSurfaceFormat(newSurface, SDL_PIXELFORMAT_RGBA32, 0);
-            SDL_FreeSurface(newSurface);
+            SDL_Surface *convertedSurface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA32, 0);
+            SDL_FreeSurface(surface);
             if (convertedSurface == NULL)
             {
                 return val::null();
             }
-            newSurface = convertedSurface;
+            surface = convertedSurface;
         }
         if (format == "webp")
         {
             uint8_t *img_out;
             val result = val::null();
-            int width = newSurface->w;
-            int height = newSurface->h;
+            int width = surface->w;
+            int height = surface->h;
             int stride = width * 4;
-            size_t size = WebPEncodeRGBA(reinterpret_cast<uint8_t *>(newSurface->pixels), width, height, stride, quality, &img_out);
+
+            size_t size = WebPEncodeRGBA(reinterpret_cast<uint8_t *>(surface->pixels), width, height, stride, quality, &img_out);
             if (size > 0 && img_out)
             {
-                result = createResult(size, img_out, srcWidth, srcHeight, outWidth, outHeight);
+                result = createResult(size, img_out, image.getSrcWidth(), image.getSrcHeight(), surface->w, surface->h);
             }
             WebPFree(img_out);
-            SDL_FreeSurface(newSurface);
+            SDL_FreeSurface(surface);
             return result;
         }
         else
         {
-            int width = newSurface->w;
-            int height = newSurface->h;
-            avifImage *image = avifImageCreate(width, height, 8, AVIF_PIXEL_FORMAT_YUV444);
+            int width = surface->w;
+            int height = surface->h;
+            avifImage *avifImage = avifImageCreate(width, height, 8, AVIF_PIXEL_FORMAT_YUV444);
 
             avifRGBImage rgb;
-            avifRGBImageSetDefaults(&rgb, image);
+            avifRGBImageSetDefaults(&rgb, avifImage);
             rgb.depth = 8;
             rgb.format = AVIF_RGB_FORMAT_RGBA;
-            rgb.pixels = (uint8_t *)newSurface->pixels;
+            rgb.pixels = (uint8_t *)surface->pixels;
             rgb.rowBytes = width * 4;
 
-            if (avifImageRGBToYUV(image, &rgb) != AVIF_RESULT_OK)
+            if (avifImageRGBToYUV(avifImage, &rgb) != AVIF_RESULT_OK)
             {
                 return val::null();
             }
@@ -285,14 +327,15 @@ val optimize(std::string img_in, float width, float height, float quality, std::
 
             avifRWData raw = AVIF_DATA_EMPTY;
 
-            avifResult encodeResult = avifEncoderWrite(encoder, image, &raw);
+            avifResult encodeResult = avifEncoderWrite(encoder, avifImage, &raw);
             avifEncoderDestroy(encoder);
-            avifImageDestroy(image);
+            avifImageDestroy(avifImage);
             if (encodeResult != AVIF_RESULT_OK)
             {
                 return val::null();
             }
-            val result = createResult(raw.size, raw.data, srcWidth, srcHeight, outWidth, outHeight);
+            val result = createResult(raw.size, raw.data, image.getSrcWidth(), image.getSrcHeight(), surface->w, surface->h);
+            SDL_FreeSurface(surface);
             avifRWDataFree(&raw);
             return result;
         }
