@@ -29,7 +29,7 @@ WebAssembly is used to provide image transformation functionality.
 ## Example
 
 https://next-image-convert.vercel.app/  
-![](https://raw.githubusercontent.com/node-libraries/wasm-image-optimization/refs/heads/master/doc/image.avif)
+![](https://raw.githubusercontent.com/node-libraries/wasm-image-optimization/refs/heads/master/doc/image.webp)
 
 ## Functions
 
