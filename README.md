@@ -69,7 +69,8 @@ optimizeImageExt({
 ```ts
 waitAll(): Promise<void>
 waitReady(retryTime?: number) :Promise<void>
-close():void;
+close(): void;
+launchWorker(): Promise<void>
 ```
 
 ## WebWorker on Vite

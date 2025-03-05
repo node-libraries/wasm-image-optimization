@@ -9,6 +9,7 @@ const map = initWorker({
     _optimizeImage({ ...params, libImage }),
   optimizeImageExt: async (params: OptimizeParams) =>
     _optimizeImageExt({ ...params, libImage }),
+  launch: () => libImage,
 });
 
 export type WorkerType = typeof map;

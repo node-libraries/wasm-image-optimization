@@ -1,3 +1,4 @@
+import type { OptimizeParams, OptimizeResult } from "../types/index.js";
 export declare type ModuleType = {
   optimize: (
     data: BufferSource | string,
@@ -12,7 +13,7 @@ export declare type ModuleType = {
 
 declare const imageTools: (options?: {
   instantiateWasm?: (
-    imports?: WebAssembly.Imports,
+    imports: WebAssembly.Imports,
     receiver: (
       instance: WebAssembly.WebAssemblyInstantiatedSource,
     ) => Promise<unknown>,
