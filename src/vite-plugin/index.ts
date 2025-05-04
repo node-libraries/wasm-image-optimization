@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Plugin, ResolvedConfig } from "vite";
 
-export default (): Plugin[] => {
+export default (assetsPath?: string): Plugin[] => {
   let config: ResolvedConfig;
   return [
     {
@@ -25,7 +25,9 @@ export default (): Plugin[] => {
       writeBundle() {
         fs.copyFileSync(
           "node_modules/wasm-image-optimization/dist/esm/libImage.wasm",
-          path.resolve(config.build.outDir, "assets/libImage.wasm"),
+          assetsPath
+            ? path.resolve(assetsPath, "libImage.wasm")
+            : path.resolve(config.build.outDir, "assets/libImage.wasm")
         );
       },
     },

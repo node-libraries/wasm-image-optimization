@@ -83,7 +83,10 @@ To use Vite, the following settings are required
 import wasmImageOptimizationPlugin from "wasm-image-optimization/vite-plugin";
 
 export default defineConfig(() => ({
-  plugins: [wasmImageOptimizationPlugin()],
+  plugins: [
+    wasmImageOptimizationPlugin(),
+    //wasmImageOptimizationPlugin("build/client/assets") // optional: assetsPath
+  ],
 }));
 ```
 
@@ -91,7 +94,7 @@ export default defineConfig(() => ({
 
 - Cloudflare workers  
   `import { optimizeImage } from 'wasm-image-optimization';`
-- Next.js (Webpack)  
+- Next.js (webpack)  
   `import { optimizeImage } from 'wasm-image-optimization/next';`
 - ESM (import base) & Deno Deploy  
   `import { optimizeImage } from 'wasm-image-optimization';`
