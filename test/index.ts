@@ -10,7 +10,7 @@ import {
 
 const formats = ["webp", "jpeg", "png", "avif", "none"] as const;
 
-setLimit(8);
+setLimit(16);
 
 const main = async () => {
   await launchWorker();
@@ -52,43 +52,6 @@ const main = async () => {
     });
   });
   await Promise.all(p);
-  const urls = [
-    "https://raw.githubusercontent.com/AOMediaCodec/av1-avif/refs/heads/master/testFiles/Apple/multilayer_examples/animals_00_singlelayer.avif",
-    "https://raw.githubusercontent.com/AOMediaCodec/av1-avif/refs/heads/master/testFiles/Microsoft/Chimera_10bit_cropped_to_1920x1008.avif",
-  ];
-  for (const url of urls) {
-    const data = await fetch(url).then((res) => res.arrayBuffer());
-    const u = new URL(url);
-    const file = u.pathname.split("/").pop();
-    if (!file) return;
-    optimizeImage({
-      image: data,
-      quality: 100,
-      format: "jpeg",
-      width: 300,
-      speed: 6,
-    }).then(async () => {
-      for (const format of formats) {
-        optimizeImage({
-          image: data,
-          quality: 100,
-          format,
-          width: 100,
-          height: 100,
-        }).then((encoded) => {
-          console.log(!!encoded, file, format);
-          if (encoded) {
-            const fileName = file.split(".");
-            const filePath =
-              format === "none"
-                ? `image_output/${fileName[0]}_.${fileName[1]}`
-                : `image_output/${fileName[0]}.${format}`;
-            fs.writeFile(filePath, encoded);
-          }
-        });
-      }
-    });
-  }
 
   for (let i = 0; i <= 8; i++) {
     const data = await fetch(
