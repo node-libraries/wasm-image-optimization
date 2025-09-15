@@ -13,4 +13,5 @@ export type OptimizeParams = {
   quality?: number; // The desired output quality (0-100, optional)
   format?: "jpeg" | "png" | "webp" | "avif" | "none"; // The desired output format (optional)
   speed?: number; // The desired speed (0-10, Slow-Fast, Optional)
+  filter?: boolean; // resize filter (default true)
 };

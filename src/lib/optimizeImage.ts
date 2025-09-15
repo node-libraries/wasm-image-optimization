@@ -3,7 +3,7 @@ import type { OptimizeParams } from "../types/index.js";
 
 const result = (
   result: ReturnType<ModuleType["optimize"]> | undefined,
-  releaseResult: () => void,
+  releaseResult: () => void
 ) => {
   const r = result
     ? { ...result, data: Uint8Array.from(result.data) }
@@ -18,6 +18,7 @@ export const _optimizeImage = async ({
   quality = 100,
   format = "avif",
   speed = 6,
+  filter = true,
   libImage,
 }: OptimizeParams & {
   libImage: Promise<ModuleType>;
@@ -29,6 +30,7 @@ export const _optimizeImage = async ({
     quality,
     format,
     speed,
+    filter,
     libImage,
   }).then((r) => r?.data);
 
@@ -39,13 +41,14 @@ export const _optimizeImageExt = async ({
   quality = 100,
   format = "avif",
   speed = 6,
+  filter = true,
   libImage,
 }: OptimizeParams & {
   libImage: Promise<ModuleType>;
 }) =>
   libImage.then(({ optimize, releaseResult }) =>
     result(
-      optimize(image, width, height, quality, format, speed),
-      releaseResult,
-    ),
+      optimize(image, width, height, quality, format, speed, filter),
+      releaseResult
+    )
   );

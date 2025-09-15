@@ -37,23 +37,25 @@ https://next-image-convert.vercel.app/
 
 ```ts
 optimizeImage({
-  image: ArrayBuffer,
-  width?: number,
-  height?:number,
-  quality?: number, // quality: 1-100
-  format?: "png" | "jpeg" | "avif" | "webp" | "none"}
-  speed?: number // avif-speed: 0-10 (Slow-Fast, default: 6)
+  image: BufferSource | Buffer | string; // The input image data
+  width?: number; // The desired output width (optional)
+  height?: number; // The desired output height (optional)
+  quality?: number; // The desired output quality (0-100, optional)
+  format?: "jpeg" | "png" | "webp" | "avif" | "none"; // The desired output format (optional)
+  speed?: number; // The desired speed (0-10, Slow-Fast, Optional)
+  filter?: boolean; // resize filter (default true)
   ):
     Promise<
       ArrayBuffer>
 
 optimizeImageExt({
-  image: ArrayBuffer,
-  width?: number,
-  height?:number,
-  quality?: number,
-  format?: "png" | "jpeg" | "avif" | "webp" | "none"}
-  speed?: number // avif-speed: 0-10 (Slow-Fast, default: 6)
+  image: BufferSource | Buffer | string; // The input image data
+  width?: number; // The desired output width (optional)
+  height?: number; // The desired output height (optional)
+  quality?: number; // The desired output quality (0-100, optional)
+  format?: "jpeg" | "png" | "webp" | "avif" | "none"; // The desired output format (optional)
+  speed?: number; // The desired speed (0-10, Slow-Fast, Optional)
+  filter?: boolean; // resize filter (default true)
   ):
     Promise<{
       data: Uint8Array,

@@ -8,6 +8,7 @@
 #include <libexif/exif-data.h>
 #include <avif/avif.h>
 #include <lunasvg.h>
+#include <lancir.h>
 
 using namespace emscripten;
 using namespace lunasvg;
@@ -139,8 +140,40 @@ public:
     exif_data_unref(ed);
     return orientation;
   }
+  SDL_Surface *resize(SDL_Surface *srcSurface, int outWidth, int outHeight, bool filter)
+  {
+    if (!filter)
+    {
+      SDL_Surface *newSurface = zoomSurface(srcSurface, (float)outWidth / m_srcWidth, (float)outHeight / m_srcHeight, SMOOTHING_ON);
+      SDL_FreeSurface(srcSurface);
+      return newSurface;
+    }
+    if (srcSurface->format->format != SDL_PIXELFORMAT_RGBA32)
+    {
+      SDL_Surface *convertedSurface = SDL_ConvertSurfaceFormat(srcSurface, SDL_PIXELFORMAT_RGBA32, 0);
+      SDL_FreeSurface(srcSurface);
+      if (convertedSurface == NULL)
+      {
+        return nullptr;
+      }
+      srcSurface = convertedSurface;
+    }
+    size_t outStride = outWidth * 4;
+    size_t outSize = outStride * outHeight;
 
-  SDL_Surface *getSurface(bool convert)
+    SDL_Surface *dst = SDL_CreateRGBSurfaceWithFormat(0, outWidth, outHeight, 32, SDL_PIXELFORMAT_RGBA32);
+
+    avir::CLancIR lancir;
+    lancir.resizeImage(
+        (uint8_t *)srcSurface->pixels, srcSurface->w, srcSurface->h, 0,
+        (uint8_t *)dst->pixels, outWidth, outHeight, 0,
+        4);
+    SDL_FreeSurface(srcSurface);
+
+    return dst;
+  }
+
+  SDL_Surface *getSurface(bool convert, bool filter)
   {
     if (!m_rw)
     {
@@ -187,8 +220,7 @@ public:
       outWidth = outHeight * aspectSrc;
     }
 
-    SDL_Surface *newSurface = zoomSurface(srcSurface, (float)outWidth / m_srcWidth, (float)outHeight / m_srcHeight, SMOOTHING_ON);
-    SDL_FreeSurface(srcSurface);
+    SDL_Surface *newSurface = resize(srcSurface, outWidth, outHeight, filter);
     if (!newSurface)
     {
       return nullptr;
@@ -241,10 +273,10 @@ public:
   }
 };
 
-val optimize(std::string img_in, float width, float height, float quality, std::string format, int speed = 6)
+val optimize(std::string img_in, float width, float height, float quality, std::string format, int speed = 6, bool filter = true)
 {
   Image image(img_in, width, height);
-  auto surface = image.getSurface(format != "none");
+  auto surface = image.getSurface(format != "none", filter);
   if (!surface)
   {
     return val::null();

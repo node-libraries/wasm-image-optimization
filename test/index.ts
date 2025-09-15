@@ -31,6 +31,7 @@ const main = async () => {
           quality: 100,
           format,
           width: 512,
+          filter: true,
         })
           .catch(() => undefined)
           .then((encoded) => {
