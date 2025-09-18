@@ -4,8 +4,10 @@ DISTDIR=dist
 ESMDIR=$(DISTDIR)/esm
 WORKERSDIR=$(DISTDIR)/cjs
 LIBDIR=libavif/ext
+MAIN=src/cpp/libImage.cpp
+LIBS=$(wildcard src/cpp/libs/*.cpp)
 
-TARGET_ESM_BASE = $(notdir $(basename src/libImage.cpp))
+TARGET_ESM_BASE = $(notdir $(basename ${MAIN}))
 TARGET_ESM = $(ESMDIR)/$(TARGET_ESM_BASE).js
 TARGET_WORKERS = $(WORKERSDIR)/$(TARGET_ESM_BASE).js
 
@@ -115,14 +117,14 @@ $(ESMDIR) $(WORKERSDIR):
 
 esm: $(TARGET_ESM)
 
-$(TARGET_ESM): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(WORKDIR)/libexif.a $(LIBDIR)/aom_build/libaom.a \
+$(TARGET_ESM): ${MAIN} ${LIBS} $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(WORKDIR)/libexif.a $(LIBDIR)/aom_build/libaom.a \
        $(WORKDIR)/svg.a $(WORKDIR)/ovg.a | $(ESMDIR)
 	emcc $(CFLAGS) -o $@ $^ \
        $(CFLAGS_ASM)  -s EXPORT_ES6=1
 
 workers: $(TARGET_WORKERS)
 
-$(TARGET_WORKERS): src/libImage.cpp $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(WORKDIR)/libexif.a $(LIBDIR)/aom_build/libaom.a \
+$(TARGET_WORKERS): ${MAIN} ${LIBS} $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(WORKDIR)/libexif.a $(LIBDIR)/aom_build/libaom.a \
        $(WORKDIR)/svg.a $(WORKDIR)/ovg.a | $(WORKERSDIR)
 	emcc $(CFLAGS) -o $@ $^ \
        $(CFLAGS_ASM)
