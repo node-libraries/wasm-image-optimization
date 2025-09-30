@@ -25,7 +25,7 @@ WebAssembly is used to provide image transformation functionality.
     - png
     - webp
     - thumbhash
-    - raw (Uncompressed (width*height*4))
+    - raw (Uncompressed (width\*height\*4))
     - avif (default)
 
 ## Example
