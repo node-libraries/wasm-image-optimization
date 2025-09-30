@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdint>
 #include <algorithm>
+#include <wasm_simd128.h>
 
 std::vector<uint8_t> rgbaToThumbHash(int w, int h, const uint8_t *rgba)
 {
@@ -9,21 +10,28 @@ std::vector<uint8_t> rgbaToThumbHash(int w, int h, const uint8_t *rgba)
   const int size = w * h;
 
   // --- Average color ---
-  double avg_r = 0, avg_g = 0, avg_b = 0, avg_a = 0;
+  v128_t avg_rgba_f = wasm_f32x4_splat(0.0f);
   for (int i = 0; i < size; ++i)
   {
-    double alpha = rgba[i * 4 + 3] / 255.0;
-    double f = alpha / 255.0;
-    avg_r += f * rgba[i * 4 + 0];
-    avg_g += f * rgba[i * 4 + 1];
-    avg_b += f * rgba[i * 4 + 2];
-    avg_a += alpha;
+    float alpha = rgba[i * 4 + 3] / 255.0f;
+    float f = alpha / 255.0f;
+    v128_t pixel = wasm_f32x4_make(
+        f * rgba[i * 4 + 0],
+        f * rgba[i * 4 + 1],
+        f * rgba[i * 4 + 2],
+        alpha);
+    avg_rgba_f = wasm_f32x4_add(avg_rgba_f, pixel);
   }
+
+  float avg_buf[4];
+  wasm_v128_store(avg_buf, avg_rgba_f);
+  double avg_a = avg_buf[3];
+  double avg_r = 0, avg_g = 0, avg_b = 0;
   if (avg_a > 0)
   {
-    avg_r /= avg_a;
-    avg_g /= avg_a;
-    avg_b /= avg_a;
+    avg_r = avg_buf[0] / avg_a;
+    avg_g = avg_buf[1] / avg_a;
+    avg_b = avg_buf[2] / avg_a;
   }
 
   bool hasAlpha = avg_a < size;
@@ -34,16 +42,63 @@ std::vector<uint8_t> rgbaToThumbHash(int w, int h, const uint8_t *rgba)
   std::vector<float> l(size), p(size), q(size), a(size);
 
   // --- Convert to LPQA ---
-  for (int i = 0; i < size; ++i)
+  const v128_t avg_rgb_f = wasm_f32x4_make(avg_r, avg_g, avg_b, 0.0f);
+  const v128_t inv_255 = wasm_f32x4_splat(1.0f / 255.0f);
+  const v128_t one = wasm_f32x4_splat(1.0f);
+  const v128_t half = wasm_f32x4_splat(0.5f);
+  const v128_t third = wasm_f32x4_splat(1.0f / 3.0f);
+
+  for (int i = 0; i < size; i += 4)
   {
-    double alpha = rgba[i * 4 + 3] / 255.0;
-    double r = avg_r * (1 - alpha) + (alpha / 255.0) * rgba[i * 4 + 0];
-    double g = avg_g * (1 - alpha) + (alpha / 255.0) * rgba[i * 4 + 1];
-    double b = avg_b * (1 - alpha) + (alpha / 255.0) * rgba[i * 4 + 2];
-    l[i] = (r + g + b) / 3.0f;
-    p[i] = ((r + g) / 2.0f) - b;
-    q[i] = r - g;
-    a[i] = alpha;
+    int count = std::min(4, size - i);
+    v128_t r_u8 = wasm_v128_load8_splat(&rgba[(i) * 4 + 0]);
+    v128_t g_u8 = wasm_v128_load8_splat(&rgba[(i) * 4 + 1]);
+    v128_t b_u8 = wasm_v128_load8_splat(&rgba[(i) * 4 + 2]);
+    v128_t a_u8 = wasm_v128_load8_splat(&rgba[(i) * 4 + 3]);
+
+    v128_t r_u32 = wasm_u32x4_extend_low_u16x8(wasm_u16x8_extend_low_u8x16(r_u8));
+    v128_t g_u32 = wasm_u32x4_extend_low_u16x8(wasm_u16x8_extend_low_u8x16(g_u8));
+    v128_t b_u32 = wasm_u32x4_extend_low_u16x8(wasm_u16x8_extend_low_u8x16(b_u8));
+    v128_t a_u32 = wasm_u32x4_extend_low_u16x8(wasm_u16x8_extend_low_u8x16(a_u8));
+
+    v128_t r_f = wasm_f32x4_convert_i32x4(r_u32);
+    v128_t g_f = wasm_f32x4_convert_i32x4(g_u32);
+    v128_t b_f = wasm_f32x4_convert_i32x4(b_u32);
+    v128_t alpha_f = wasm_f32x4_mul(wasm_f32x4_convert_i32x4(a_u32), inv_255);
+
+    v128_t r_final = wasm_f32x4_add(wasm_f32x4_mul(wasm_f32x4_splat(avg_r), wasm_f32x4_sub(one, alpha_f)), wasm_f32x4_mul(wasm_f32x4_mul(alpha_f, inv_255), r_f));
+    v128_t g_final = wasm_f32x4_add(wasm_f32x4_mul(wasm_f32x4_splat(avg_g), wasm_f32x4_sub(one, alpha_f)), wasm_f32x4_mul(wasm_f32x4_mul(alpha_f, inv_255), g_f));
+    v128_t b_final = wasm_f32x4_add(wasm_f32x4_mul(wasm_f32x4_splat(avg_b), wasm_f32x4_sub(one, alpha_f)), wasm_f32x4_mul(wasm_f32x4_mul(alpha_f, inv_255), b_f));
+
+    v128_t l_f = wasm_f32x4_mul(wasm_f32x4_add(r_final, wasm_f32x4_add(g_final, b_final)), third);
+    v128_t p_f = wasm_f32x4_sub(wasm_f32x4_mul(wasm_f32x4_add(r_final, g_final), half), b_final);
+    v128_t q_f = wasm_f32x4_sub(r_final, g_final);
+
+    wasm_v128_store32_lane(&l[i], l_f, 0);
+    wasm_v128_store32_lane(&p[i], p_f, 0);
+    wasm_v128_store32_lane(&q[i], q_f, 0);
+    wasm_v128_store32_lane(&a[i], alpha_f, 0);
+    if (count > 1)
+    {
+      wasm_v128_store32_lane(&l[i + 1], l_f, 1);
+      wasm_v128_store32_lane(&p[i + 1], p_f, 1);
+      wasm_v128_store32_lane(&q[i + 1], q_f, 1);
+      wasm_v128_store32_lane(&a[i + 1], alpha_f, 1);
+    }
+    if (count > 2)
+    {
+      wasm_v128_store32_lane(&l[i + 2], l_f, 2);
+      wasm_v128_store32_lane(&p[i + 2], p_f, 2);
+      wasm_v128_store32_lane(&q[i + 2], q_f, 2);
+      wasm_v128_store32_lane(&a[i + 2], alpha_f, 2);
+    }
+    if (count > 3)
+    {
+      wasm_v128_store32_lane(&l[i + 3], l_f, 3);
+      wasm_v128_store32_lane(&p[i + 3], p_f, 3);
+      wasm_v128_store32_lane(&q[i + 3], q_f, 3);
+      wasm_v128_store32_lane(&a[i + 3], alpha_f, 3);
+    }
   }
 
   // --- DCT helper ---
