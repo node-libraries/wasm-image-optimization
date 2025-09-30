@@ -8,6 +8,7 @@
 #include "libs/MemoryManager.h"
 #include "libs/MemoryRW.h"
 #include "libs/Image.h"
+#include "libs/ThumbHash.h"
 
 using namespace emscripten;
 
@@ -42,6 +43,7 @@ val optimize(std::string img_in, float width, float height, float quality, std::
   {
     return val::null();
   }
+
   if (format == "none")
   {
     val result = createResult(img_in.size(), (const uint8_t *)img_in.c_str(), surface->w, surface->h, surface->w, surface->h);
@@ -79,6 +81,17 @@ val optimize(std::string img_in, float width, float height, float quality, std::
         return val::null();
       }
       surface = convertedSurface;
+    }
+    if (format == "raw")
+    {
+      val result = createResult(surface->w * surface->h * 4, reinterpret_cast<uint8_t *>(surface->pixels), image.getSrcWidth(), image.getSrcHeight(), surface->w, surface->h);
+      return result;
+    }
+    if (format == "thumbhash")
+    {
+      auto hash = rgbaToThumbHash(surface->w, surface->h, reinterpret_cast<uint8_t *>(surface->pixels));
+      val result = createResult(hash.size(), hash.data(), image.getSrcWidth(), image.getSrcHeight(), surface->w, surface->h);
+      return result;
     }
     if (format == "webp")
     {

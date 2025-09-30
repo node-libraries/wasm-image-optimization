@@ -71,6 +71,31 @@ const main = async () => {
     });
   }
   await waitAll();
+
+  const p2 = files.map((file) => {
+    return fs.readFile(`./images/${file}`).then((image) => {
+      const label = `[${file}]`;
+      console.time(label);
+      return (
+        optimizeImage({
+          image,
+          quality: 100,
+          format: "thumbhash",
+          width: 100,
+          height: 100,
+          filter: true,
+        })
+          // .catch(() => undefined)
+          .then((encoded) => {
+            if (encoded) {
+              console.timeLog(label, btoa(String.fromCharCode(...encoded)));
+            }
+          })
+      );
+    });
+  });
+  await Promise.all(p2);
+
   close();
 };
 main();
