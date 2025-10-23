@@ -9,7 +9,7 @@ export type { OptimizeParams, OptimizeResult };
 
 const libImage = LibImage({
   wasmBinary: fs.readFileSync(
-    path.resolve(__dirname, "../../esm/libImage.wasm"),
+    path.resolve(__dirname, "../../cjs/libImage.wasm")
   ) as never,
 });
 

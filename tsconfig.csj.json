@@ -11,13 +11,8 @@
     "dist",
     "test",
     "src/workers",
-    "src/next",
-    "src/next-back",
     "src/esm",
-    "src/vite",
-    "src/vite-plugin",
-    "src/vite-web-worker",
-    "src/next-web-worker",
+    "src/web-worker",
     "eslint.config.mjs"
   ]
 }

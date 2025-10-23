@@ -1,48 +1,26 @@
 {
   "name": "wasm-image-optimization",
   "description": "Optimize images with wasm on edge runtime",
-  "version": "1.3.1",
+  "version": "1.4.2",
   "scripts": {
     "test": "yarn ts-node test",
     "lint:fix": "eslint --fix src/ && prettier -w src",
     "build": "tsc && tsc -p ./tsconfig.csj.json && cpy esm dist && tsx bin/build",
-    "build:wasm": "docker compose -f docker/docker-compose.yml run --build --rm emcc make -j",
-    "docker:shell": "docker compose -f docker/docker-compose.yml run --build --rm emcc bash -l"
+    "build:wasm": "mkdirp dist && docker compose -f docker/docker-compose.yml run --build --rm emcc make -j",
+    "docker:shell": "mkdirp dist && docker compose -f docker/docker-compose.yml run --build --rm emcc bash -l"
   },
   "exports": {
     "./esm": {
       "import": "./dist/esm/index.js",
       "types": "./dist/esm/index.d.ts"
     },
-    "./next": {
-      "types": "./dist/next-web-worker/index.d.ts",
-      "browser": "./dist/next-web-worker/index.js",
-      "edge-light": "./dist/next/index.js",
-      "node": "./dist/next/index.js"
-    },
-    "./next-api": {
-      "types": "./dist/next-web-worker/index.d.ts",
-      "browser": "./dist/next-web-worker/index.js",
-      "edge-light": "./dist/next/index.js",
-      "node": "./dist/next/index.js"
-    },
     "./node": {
       "types": "./dist/cjs/node/index.d.ts",
       "default": "./dist/cjs/node/index.js"
     },
-    "./vite": {
-      "types": "./dist/vite/index.d.ts",
-      "browser": "./dist/vite/index.js",
-      "node": "./dist/dummy/index.js",
-      "default": "./dist/dummy/index.js"
-    },
-    "./vite-plugin": {
-      "types": "./dist/vite-plugin/index.d.ts",
-      "default": "./dist/vite-plugin/index.js"
-    },
     "./web-worker": {
-      "types": "./dist/vite-web-worker/index.d.ts",
-      "browser": "./dist/vite-web-worker/index.js",
+      "types": "./dist/web-worker/index.d.ts",
+      "browser": "./dist/web-worker/index.js",
       "node": "./dist/dummy/index.js"
     },
     "./node-worker": {
@@ -71,6 +49,10 @@
         "types": "./dist/workers/index.d.ts",
         "default": "./dist/workers/index.js"
       }
+    },
+    "./vite-plugin": {
+      "types": "./dist/vite-plugin/index.d.ts",
+      "default": "./dist/vite-plugin/index.js"
     }
   },
   "typesVersions": {
@@ -78,11 +60,8 @@
       "edge": [
         "./dist/esm/index.d.ts"
       ],
-      "next": [
-        "./dist/next-web-worker/index.d.ts"
-      ],
       "web-worker": [
-        "./dist/vite-web-worker/index.d.ts"
+        "./dist/web-worker/index.d.ts"
       ],
       "node-worker": [
         "./dist/cjs/node/cjs-worker.d.ts"
@@ -100,25 +79,26 @@
   },
   "license": "MIT",
   "dependencies": {
-    "worker-lib": "2.0.7"
+    "mkdirp": "3.0.1",
+    "worker-lib": "2.0.8"
   },
   "devDependencies": {
-    "@eslint/js": "9.28.0",
-    "@types/node": "24.0.1",
-    "@typescript-eslint/eslint-plugin": "^8.34.0",
-    "@typescript-eslint/parser": "^8.34.0",
-    "cpy-cli": "^5.0.0",
-    "esbuild": "0.25.5",
-    "eslint": "9.28.0",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-import-resolver-typescript": "^4.4.3",
-    "eslint-plugin-import": "^2.31.0",
-    "prettier": "^3.5.3",
+    "@eslint/js": "9.38.0",
+    "@types/node": "24.9.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
+    "cpy-cli": "^6.0.0",
+    "esbuild": "0.25.11",
+    "eslint": "9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
-    "tsx": "4.20.1",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.34.0",
-    "vite": "6.3.5"
+    "tsx": "4.20.6",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2",
+    "vite": "7.1.11"
   },
   "publishConfig": {
     "access": "public"

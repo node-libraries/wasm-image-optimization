@@ -120,7 +120,7 @@ esm: $(TARGET_ESM)
 $(TARGET_ESM): ${MAIN} ${LIBS} $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(WORKDIR)/libexif.a $(LIBDIR)/aom_build/libaom.a \
        $(WORKDIR)/svg.a $(WORKDIR)/ovg.a | $(ESMDIR)
 	emcc $(CFLAGS) -o $@ $^ \
-       $(CFLAGS_ASM)  -s EXPORT_ES6=1
+       $(CFLAGS_ASM)  -s EXPORT_ES6=1 -s SINGLE_FILE=1
 
 workers: $(TARGET_WORKERS)
 
@@ -128,7 +128,6 @@ $(TARGET_WORKERS): ${MAIN} ${LIBS} $(WORKDIR)/webp.a $(WORKDIR)/avif.a $(WORKDIR
        $(WORKDIR)/svg.a $(WORKDIR)/ovg.a | $(WORKERSDIR)
 	emcc $(CFLAGS) -o $@ $^ \
        $(CFLAGS_ASM)
-	@rm $(WORKERSDIR)/$(TARGET_ESM_BASE).wasm
 
 clean:
 	@echo Cleaning up...

@@ -3,12 +3,10 @@
 WebAssembly is used to provide image transformation functionality.
 
 - Frontend
-
   - Next.js (Multithreading support)
   - React Router (Multithreading support)
 
 - Backend
-
   - Cloudflare Workers
   - Deno Deploy
   - Node.js (Multithreading support)
@@ -68,15 +66,6 @@ optimizeImageExt({
 
 ```
 
-- Multi Threading
-
-```ts
-waitAll(): Promise<void>
-waitReady(retryTime?: number) :Promise<void>
-close(): void;
-launchWorker(): Promise<void>
-```
-
 ## WebWorker on Vite
 
 To use Vite, the following settings are required
@@ -87,27 +76,33 @@ To use Vite, the following settings are required
 import wasmImageOptimizationPlugin from "wasm-image-optimization/vite-plugin";
 
 export default defineConfig(() => ({
-  plugins: [
-    wasmImageOptimizationPlugin(),
-    //wasmImageOptimizationPlugin("build/client/assets") // optional: assetsPath
-  ],
+  plugins: [wasmImageOptimizationPlugin()],
 }));
+```
+
+- Multi Threading
+
+```ts
+waitAll(): Promise<void>
+waitReady(retryTime?: number) :Promise<void>
+close(): void;
+launchWorker(): Promise<void>
 ```
 
 ## Supported Environments
 
 - Cloudflare workers  
   `import { optimizeImage } from 'wasm-image-optimization';`
-- Next.js (webpack)  
-  `import { optimizeImage } from 'wasm-image-optimization/next';`
+- Next.js  
+  `import { optimizeImage } from 'wasm-image-optimization';`
 - ESM (import base) & Deno Deploy  
   `import { optimizeImage } from 'wasm-image-optimization';`
 - Node.js  
   `import { optimizeImage } from 'wasm-image-optimization';`
+- Vite (Browser)  
+  `import { optimizeImage } from 'wasm-image-optimization';`
 - Node.js(Multi thread)  
   `import { optimizeImage } from 'wasm-image-optimization/node-worker';`
-- Vite (Browser)  
-  `import { optimizeImage } from 'wasm-image-optimization/vite';`
 - Web Worker (Browser) Multi process  
   `import { optimizeImage } from 'wasm-image-optimization/web-worker';`
 
