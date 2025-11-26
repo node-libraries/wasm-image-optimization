@@ -46,6 +46,7 @@ AVIF_SOURCES := libavif/src/alpha.c \
                 libavif/src/write.c \
                 libavif/src/gainmap.c \
                 libavif/src/codec_aom.c \
+								libavif/src/sampletransform.c \
                 libavif/third_party/libyuv/source/scale.c \
                 libavif/third_party/libyuv/source/scale_common.c \
                 libavif/third_party/libyuv/source/scale_any.c \
