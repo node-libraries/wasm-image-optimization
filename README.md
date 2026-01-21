@@ -13,6 +13,7 @@ WebAssembly is used to provide image transformation functionality.
 
 - Convert
   - source format
+    - gif
     - svg
     - jpeg (EXIF orientation is supported)
     - png

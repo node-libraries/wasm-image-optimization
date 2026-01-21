@@ -19,7 +19,7 @@ CFLAGS = -O3 -msimd128 -sSTACK_SIZE=5MB \
 CFLAGS_ASM = --bind \
              -s WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s ENVIRONMENT=web -s DYNAMIC_EXECUTION=0 -s MODULARIZE=1 \
              -s USE_SDL=3 -s USE_SDL_IMAGE=2 -s USE_SDL_GFX=2 \
-             -s SDL2_IMAGE_FORMATS='["png","jpg","webp","svg","avif"]'
+             -s SDL2_IMAGE_FORMATS='["gif","png","jpg","webp","svg","avif"]'
 
 WEBP_SOURCES := $(wildcard libwebp/src/dsp/*.c) \
                 $(wildcard libwebp/src/enc/*.c) \
