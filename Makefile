@@ -13,7 +13,7 @@ TARGET_WORKERS = $(WORKERSDIR)/$(TARGET_ESM_BASE).js
 
 CFLAGS = -O3 -msimd128 -sSTACK_SIZE=5MB \
         -Ilibwebp -Ilibwebp/src -Ilibavif/include -Ilibavif/third_party/libyuv/include -Ilibavif/ext/aom \
-        -Ilibexif -Ilunasvg/include -Ilunasvg/plutovg/include -Iavir\
+        -Ilibexif -Ilunasvg/include -Iavir\
         -DAVIF_CODEC_AOM_ENCODE -DAVIF_CODEC_AOM_DECODE -DAVIF_CODEC_AOM=LOCAL
 
 CFLAGS_ASM = --bind \
@@ -59,8 +59,8 @@ EXIF_SOURCES := $(wildcard libexif/libexif/*.c) \
                 $(wildcard libexif/libexif/olympus/*.c) \
                 $(wildcard libexif/libexif/pentax/*.c) 
 
-SVG_SOURCES := $(wildcard lunasvg/source/*.cpp)
-OVG_SOURCES := $(wildcard lunasvg/plutovg/source/*.c)
+SVG_SOURCES := $(wildcard lunasvg/source/lunasvg/*.cpp)
+OVG_SOURCES := $(wildcard lunasvg/source/plutovg/*.c)
 
 WEBP_OBJECTS := $(WEBP_SOURCES:.c=.o)
 AVIF_OBJECTS := $(AVIF_SOURCES:.c=.o)
