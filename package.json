@@ -1,7 +1,7 @@
 {
   "name": "wasm-image-optimization",
   "description": "Optimize images with wasm on edge runtime",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "scripts": {
     "test": "yarn ts-node test",
     "lint:fix": "eslint --fix src/ && prettier -w src",
@@ -80,24 +80,24 @@
   "license": "MIT",
   "dependencies": {
     "mkdirp": "3.0.1",
-    "worker-lib": "2.0.8"
+    "worker-lib": "2.2.0"
   },
   "devDependencies": {
-    "@eslint/js": "9.39.2",
-    "@types/node": "25.0.9",
-    "@typescript-eslint/eslint-plugin": "^8.53.1",
-    "@typescript-eslint/parser": "^8.53.1",
-    "cpy-cli": "^6.0.0",
-    "esbuild": "0.27.2",
-    "eslint": "9.39.2",
+    "@eslint/js": "10.0.1",
+    "@types/node": "25.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.56.0",
+    "@typescript-eslint/parser": "^8.56.0",
+    "cpy-cli": "^7.0.0",
+    "esbuild": "0.27.3",
+    "eslint": "10.0.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
-    "prettier": "^3.8.0",
+    "prettier": "^3.8.1",
     "ts-node": "^10.9.2",
     "tsx": "4.21.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.53.1",
+    "typescript-eslint": "^8.56.0",
     "vite": "7.3.1"
   },
   "publishConfig": {
