@@ -11,7 +11,7 @@ TARGET_ESM_BASE = $(notdir $(basename ${MAIN}))
 TARGET_ESM = $(ESMDIR)/$(TARGET_ESM_BASE).js
 TARGET_WORKERS = $(WORKERSDIR)/$(TARGET_ESM_BASE).js
 
-CFLAGS = -O3 -msimd128 -sSTACK_SIZE=5MB \
+CFLAGS = -O3 -msimd128 -sSTACK_SIZE=25MB \
         -Ilibwebp -Ilibwebp/src -Ilibavif/include -Ilibavif/third_party/libyuv/include -Ilibavif/ext/aom \
         -Ilibexif -Ilunasvg/include -Iavir\
         -DAVIF_CODEC_AOM_ENCODE -DAVIF_CODEC_AOM_DECODE -DAVIF_CODEC_AOM=LOCAL
