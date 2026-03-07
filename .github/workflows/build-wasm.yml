@@ -33,10 +33,7 @@ jobs:
     
       - name: Create package zip
         run: |
-          mkdir release
-          cp package.json release/
-          cp -r dist release/
-          zip -r wasm-image-optimization-build.zip release
+          zip -r wasm-image-optimization-build.zip package.json dist
     
       - name: Upload artifact
         uses: actions/upload-artifact@v4
