@@ -33,10 +33,10 @@ jobs:
     
       - name: Create package zip
         run: |
-          zip -r wasm-image-optimization-build.zip package.json dist
-    
+          tar -czf wasm-image-optimization-build.tar.gz package.json dist
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: wasm-image-optimization-build
-          path: wasm-image-optimization-build.zip
+          path: wasm-image-optimization-build.tar.gz
