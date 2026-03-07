@@ -1,0 +1,39 @@
+name: Build WASM Package
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-package:
+    runs-on: ubuntu-latest
+  
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+    
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+    
+      - name: Install dependencies
+        run: npm install
+    
+      - name: Build TypeScript
+        run: npm run build
+    
+      - name: Build WASM
+        run: npm run build:wasm
+    
+      - name: Create package zip
+        run: |
+          mkdir release
+          cp package.json release/
+          cp -r dist release/
+          zip -r wasm-image-optimization-build.zip release
+    
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-image-optimization-build
+          path: wasm-image-optimization-build.zip
