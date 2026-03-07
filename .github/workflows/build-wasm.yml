@@ -24,6 +24,9 @@ jobs:
 
       - name: Build WASM
         run: npm run build:wasm
+
+      - name: Fix dist permissions
+        run: sudo chown -R $(whoami):$(whoami) dist
     
       - name: Build TypeScript
         run: npm run build
