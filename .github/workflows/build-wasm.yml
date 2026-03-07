@@ -21,12 +21,12 @@ jobs:
       
       - name: Install dependencies
         run: yarn install
+
+      - name: Build WASM
+        run: npm run build:wasm
     
       - name: Build TypeScript
         run: npm run build
-    
-      - name: Build WASM
-        run: npm run build:wasm
     
       - name: Create package zip
         run: |
