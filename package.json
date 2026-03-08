@@ -20,7 +20,8 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
-  "repository": "https://github.com/SoraKumo001/image_converter",
   "author": "SoraKumo <info@croud.jp>",
-  "license": "MIT"
+  "license": "MIT",
+  "main": "index.js",
+  "repository": "https://github.com/node-libraries/wasm-image-optimization"
 }
