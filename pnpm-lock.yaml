@@ -89,8 +89,24 @@ importers:
   packages/deno-image-optimization:
     dependencies:
       wasm-image-optimization:
-        specifier: 1.4.4
-        version: 1.4.4
+        specifier: workspace:*
+        version: link:../core
+
+  packages/node-image-convert:
+    dependencies:
+      wasm-image-optimization:
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@types/node':
+        specifier: 25.3.5
+        version: 25.3.5
+      tsx:
+        specifier: 4.21.0
+        version: 4.21.0
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
 
   packages/playground:
     dependencies:
@@ -2195,11 +2211,6 @@ packages:
   minimist@1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
 
-  mkdirp@3.0.1:
-    resolution: {integrity: sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg==}
-    engines: {node: '>=10'}
-    hasBin: true
-
   ms@2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
 
@@ -2811,9 +2822,6 @@ packages:
       jsdom:
         optional: true
 
-  wasm-image-optimization@1.4.4:
-    resolution: {integrity: sha512-lx3mgBaL1Zg+hjY2y1pwklWrTAyeF9UIFR0K54pxZvmr9L+M+sUwLM4EAWXFnUf/WG8PNcq+vUq8OMqs3vgfig==}
-
   watchpack@2.5.1:
     resolution: {integrity: sha512-Zn5uXdcFNIA1+1Ei5McRd+iRzfhENPCe7LeABkJtNulSxjma+l7ltNx55BWZkRlwRnpOgHqxnjyaDgJnNXnqzg==}
     engines: {node: '>=10.13.0'}
@@ -2865,9 +2873,6 @@ packages:
   word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
-
-  worker-lib@2.0.8:
-    resolution: {integrity: sha512-nMx5ut10AaJZ1jf/4OJmIae9vvRP+Q134tWZ6h/TAjDhSeIHaRPH9SCuN0Wmacs3nZMZNzEQEA7hCGiQ68cHTg==}
 
   worker-lib@2.2.0:
     resolution: {integrity: sha512-femfnzMFgw9Uvj9LUJ1bkIi/3PJavpZNCgq9OGsrcCzxmRp2+RGkq1d+kjsvOxC8JKIAI7K4+laeq8cMWT2AYQ==}
@@ -4820,8 +4825,6 @@ snapshots:
 
   minimist@1.2.8: {}
 
-  mkdirp@3.0.1: {}
-
   ms@2.0.0: {}
 
   ms@2.1.3: {}
@@ -5542,11 +5545,6 @@ snapshots:
       - tsx
       - yaml
 
-  wasm-image-optimization@1.4.4:
-    dependencies:
-      mkdirp: 3.0.1
-      worker-lib: 2.0.8
-
   watchpack@2.5.1:
     dependencies:
       glob-to-regexp: 0.4.1
@@ -5641,8 +5639,6 @@ snapshots:
       string-width: 5.1.2
 
   word-wrap@1.2.5: {}
-
-  worker-lib@2.0.8: {}
 
   worker-lib@2.2.0: {}
 

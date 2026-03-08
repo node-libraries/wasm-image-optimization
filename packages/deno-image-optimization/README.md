@@ -16,7 +16,7 @@ https://xxxx.deno.dev/?url=https://xxx.png&q=80&w=200
   http://localhost:8000/?url=https://raw.githubusercontent.com/SoraKumo001/cloudflare-ogp/refs/heads/master/sample/image.jpg&q=80
 
 ```ts
-import { optimizeImage } from "npm:wasm-image-optimization";
+import { optimizeImage } from "wasm-image-optimization";
 
 const isValidUrl = (url: string) => {
   try {
@@ -41,14 +41,14 @@ Deno.serve(async (request) => {
   const url = new URL(request.url);
   const params = url.searchParams;
   const type = ["avif", "webp", "png", "jpeg"].find(
-    (v) => v === params.get("type")
+    (v) => v === params.get("type"),
   ) as "avif" | "webp" | "png" | "jpeg" | undefined;
   const accept = request.headers.get("accept");
   const isAvif = isType(accept, "avif");
   const isWebp = isType(accept, "webp");
 
   const cache = await caches.open(
-    `image-${isAvif ? "-avif" : ""}${isWebp ? "-webp" : ""}`
+    `image-${isAvif ? "-avif" : ""}${isWebp ? "-webp" : ""}`,
   );
 
   const cached = await cache.match(request);
@@ -74,7 +74,7 @@ Deno.serve(async (request) => {
     .then(async (res) =>
       res.ok
         ? ([await res.arrayBuffer(), res.headers.get("content-type")] as const)
-        : []
+        : [],
     )
     .catch(() => []);
 
@@ -98,18 +98,18 @@ Deno.serve(async (request) => {
     (isAvif
       ? "avif"
       : isWebp
-      ? "webp"
-      : contentType === "image/jpeg"
-      ? "jpeg"
-      : "png");
+        ? "webp"
+        : contentType === "image/jpeg"
+          ? "jpeg"
+          : "png");
 
-  const image = await optimizeImage({
+  const { data } = await optimizeImage({
     image: srcImage,
     width: width ? Number(width) : undefined,
     quality: quality ? Number(quality) : undefined,
     format,
   });
-  const response = new Response(image, {
+  const response = new Response(data, {
     headers: {
       "Content-Type": `image/${format}`,
       "Cache-Control": "public, max-age=31536000, immutable",

@@ -1,5 +1,4 @@
-// deno-lint-ignore-file no-import-prefix no-unversioned-import
-import { optimizeImage } from "npm:wasm-image-optimization";
+import { optimizeImage } from "wasm-image-optimization";
 
 const isValidUrl = (url: string) => {
   try {
@@ -86,13 +85,13 @@ Deno.serve(async (request) => {
           ? "jpeg"
           : "png");
 
-  const image = await optimizeImage({
+  const { data } = await optimizeImage({
     image: srcImage,
     width: width ? Number(width) : undefined,
     quality: quality ? Number(quality) : undefined,
     format,
   });
-  const response = new Response(image, {
+  const response = new Response(data, {
     headers: {
       "Content-Type": `image/${format}`,
       "Cache-Control": "public, max-age=31536000, immutable",
