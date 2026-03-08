@@ -3,6 +3,10 @@
 High-performance image conversion and resizing tool leveraging WebAssembly (Emscripten).
 Built on the Skia rendering engine, it supports animations (GIF/WebP) and modern formats (AVIF/SVG/ThumbHash).
 
+## Playground
+
+https://node-libraries.github.io/wasm-image-optimization/
+
 ## Features
 
 - **Multi-format Support**: Supports major raster formats and SVG loading.
