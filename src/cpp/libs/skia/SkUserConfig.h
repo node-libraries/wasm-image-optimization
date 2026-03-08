@@ -1,0 +1,56 @@
+#ifndef SkUserConfig_DEFINED
+#define SkUserConfig_DEFINED
+
+// Minimal config for Wasm
+#define SK_RELEASE
+#define SK_GAMMA_SRGB
+#undef SK_HAS_FREETYPE_SUPPORT
+#define SK_DISABLE_FREETYPE
+
+// Disable GPU Support (Ganesh & Graphite)
+#define SK_SUPPORT_GPU 0
+#define SK_GANESH 0
+#define SK_GRAPHITE 0
+
+// Disable unused features to save size
+#define SK_DISABLE_TRACING
+#define SK_DISABLE_LEGACY_SHADER_CONTEXT
+#define SK_DISABLE_LOWP_RASTER_PIPELINE
+#define SK_FORCE_RASTER_PIPELINE_BLITTER
+#define SK_DISABLE_EXOTIC_ENDPOINTS
+#define SK_DISABLE_AAA
+#define SK_DISABLE_LEGACY_FONTHOST
+#define SK_DISABLE_SOFT_MASK_PATCH
+
+// Codecs
+#define SK_HAS_WUFFS_LIBRARY
+#define SK_HAS_PNG_LIBRARY
+#undef SK_HAS_FREETYPE_EMBEDDED_BITMAPS
+#define SK_HAS_HEIF_LIBRARY
+#define SK_CODEC_DECODES_PNG
+#define SK_CODEC_DECODES_JPEG
+#define SK_CODEC_DECODES_WEBP
+#define SK_CODEC_DECODES_AVIF
+#define SK_CODEC_DECODES_GIF
+#define SK_ENCODE_PNG
+#define SK_ENCODE_JPEG
+#define SK_ENCODE_WEBP
+
+// PDF Support
+#ifndef SK_SUPPORT_PDF
+#define SK_SUPPORT_PDF 0
+#endif
+
+// SVG Support
+#ifndef SK_ENABLE_SVG
+#define SK_ENABLE_SVG
+#endif
+
+#define SK_DISABLE_LEGACY_PNG_CPP
+#define SK_DISABLE_LEGACY_IMAGE_CONEROLLING
+#define SK_DISABLE_IMAGE_FILTERS
+#define SK_DISABLE_SKPICTURE
+#define SK_DISABLE_LAYERS
+#define SK_DISABLE_EFFECTS
+
+#endif

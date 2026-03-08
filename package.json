@@ -1,117 +1,26 @@
 {
-  "name": "wasm-image-optimization",
-  "description": "Optimize images with wasm on edge runtime",
-  "version": "1.4.6",
+  "name": "wasm-image-optimization-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "test": "yarn ts-node test",
-    "lint:fix": "eslint --fix src/ && prettier -w src",
-    "build": "tsc && tsc -p ./tsconfig.csj.json && cpy esm dist && tsx bin/build",
-    "build:wasm": "mkdirp dist && docker compose -f docker/docker-compose.yml run --build --rm emcc make -j",
-    "docker:shell": "mkdirp dist && docker compose -f docker/docker-compose.yml run --build --rm emcc bash -l"
-  },
-  "exports": {
-    "./esm": {
-      "import": "./dist/esm/index.js",
-      "types": "./dist/esm/index.d.ts"
-    },
-    "./node": {
-      "types": "./dist/cjs/node/index.d.ts",
-      "default": "./dist/cjs/node/index.js"
-    },
-    "./web-worker": {
-      "types": "./dist/web-worker/index.d.ts",
-      "browser": "./dist/web-worker/index.js",
-      "node": "./dist/dummy/index.js"
-    },
-    "./node-worker": {
-      "types": "./dist/cjs/node/cjs-worker.d.ts",
-      "require": "./dist/cjs/node/cjs-worker.js",
-      "import": "./dist/cjs/node/cjs-worker.js"
-    },
-    ".": {
-      "require": {
-        "types": "./dist/cjs/node/index.d.ts",
-        "node": "./dist/cjs/node/index.js",
-        "edge-light": "./dist/esm/index.js",
-        "workerd": "./dist/workers/index.js",
-        "worker": "./dist/workers/index.js",
-        "browser": "./dist/esm/index.js"
-      },
-      "import": {
-        "types": "./dist/cjs/node/index.d.ts",
-        "node": "./dist/cjs/node/index.js",
-        "edge-light": "./dist/esm/index.js",
-        "workerd": "./dist/workers/index.js",
-        "worker": "./dist/workers/index.js",
-        "browser": "./dist/esm/index.js"
-      },
-      "default": {
-        "types": "./dist/workers/index.d.ts",
-        "default": "./dist/workers/index.js"
-      }
-    },
-    "./vite-plugin": {
-      "types": "./dist/vite-plugin/index.d.ts",
-      "default": "./dist/vite-plugin/index.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      "edge": [
-        "./dist/esm/index.d.ts"
-      ],
-      "web-worker": [
-        "./dist/web-worker/index.d.ts"
-      ],
-      "node-worker": [
-        "./dist/cjs/node/cjs-worker.d.ts"
-      ],
-      "node": [
-        "./dist/cjs/node/index.d.ts"
-      ],
-      "vite": [
-        "./dist/esm/index.d.ts"
-      ],
-      "*": [
-        "./dist/workers/index.d.ts"
-      ]
-    }
-  },
-  "license": "MIT",
-  "dependencies": {
-    "mkdirp": "3.0.1",
-    "worker-lib": "2.2.0"
+    "build": "pnpm wasm:build && pnpm --filter wasm-image-optimization build",
+    "build:js": "pnpm -r --if-present build",
+    "dev:playground": "pnpm --filter playground dev",
+    "dev:cloudflare": "pnpm --filter cloudflare-test dev",
+    "wasm:configure": "tsx ./scripts/build-wasm.ts configure",
+    "wasm:build": "tsx ./scripts/build-wasm.ts build",
+    "wasm:docker:build": "tsx ./scripts/wasm-docker-build.ts",
+    "format": "tsx ./scripts/format.ts"
   },
   "devDependencies": {
-    "@eslint/js": "10.0.1",
-    "@types/node": "25.3.0",
-    "@typescript-eslint/eslint-plugin": "^8.56.0",
-    "@typescript-eslint/parser": "^8.56.0",
-    "cpy-cli": "^7.0.0",
-    "esbuild": "0.27.3",
-    "eslint": "10.0.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-typescript": "^4.4.4",
-    "eslint-plugin-import": "^2.32.0",
-    "prettier": "^3.8.1",
-    "ts-node": "^10.9.2",
-    "tsx": "4.21.0",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.0",
-    "vite": "7.3.1"
+    "@types/node": "25.3.5",
+    "clang-format": "1.8.0",
+    "next-exec": "1.0.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   },
-  "publishConfig": {
-    "access": "public"
-  },
-  "keywords": [
-    "webp",
-    "encode",
-    "wasm",
-    "cloudflare",
-    "workers",
-    "WebAssembly"
-  ],
-  "repository": "https://github.com/node-libraries/wasm-image-optimization",
+  "repository": "https://github.com/SoraKumo001/image_converter",
   "author": "SoraKumo <info@croud.jp>",
-  "main": "index.js"
+  "license": "MIT"
 }

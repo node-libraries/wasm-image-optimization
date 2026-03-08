@@ -1,0 +1,26 @@
+{
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "serve ./out"
+  },
+  "type": "module",
+  "dependencies": {
+    "next": "16.1.6",
+    "wasm-image-optimization": "workspace:*"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.2.0",
+    "@types/node": "25.3.0",
+    "@types/react": "19.2.14",
+    "file-loader": "6.2.0",
+    "postcss": "8.5.6",
+    "serve": "14.2.6",
+    "tailwindcss": "4.2.0",
+    "typescript": "5.9.3"
+  },
+  "name": "playground",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT"
+}

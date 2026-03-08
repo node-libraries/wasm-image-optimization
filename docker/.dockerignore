@@ -1,0 +1,11 @@
+node_modules
+dist
+build
+build-wasm
+external/skia
+.git
+.vscode
+packages/visual-test/temp
+packages/visual-test/diff
+packages/visual-test/reference
+*.log

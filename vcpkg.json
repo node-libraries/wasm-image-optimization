@@ -1,0 +1,12 @@
+{
+  "name": "wasm-image-optimization-wasm",
+  "version-string": "1.0.0",
+  "dependencies": [
+    "libpng",
+    "libjpeg-turbo",
+    "libwebp",
+    "dav1d",
+    "expat",
+    "zlib"
+  ]
+}

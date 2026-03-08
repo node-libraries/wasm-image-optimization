@@ -1,0 +1,90 @@
+{
+  "name": "wasm-image-optimization",
+  "version": "2.0.0",
+  "description": "Optimize images with wasm on edge runtime",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "wasm-image-optimization": "./dist/cli.js"
+  },
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b && rolldown -c rolldown.config.js"
+  },
+  "exports": {
+    ".": {
+      "workerd": {
+        "types": "./dist/workerd.d.ts",
+        "import": "./dist/workerd.js"
+      },
+      "deno": {
+        "types": "./dist/single.d.ts",
+        "import": "./dist/single.js"
+      },
+      "single": {
+        "types": "./dist/single.d.ts",
+        "import": "./dist/single.js"
+      },
+      "types": "./dist/single.d.ts",
+      "import": "./dist/single.js",
+      "default": "./dist/single.js"
+    },
+    "./workerd": {
+      "types": "./dist/workerd.d.ts",
+      "import": "./dist/workerd.js"
+    },
+    "./workers": {
+      "types": "./dist/workers.d.ts",
+      "import": "./dist/workers.js"
+    },
+    "./single": {
+      "types": "./dist/single.d.ts",
+      "import": "./dist/single.js"
+    },
+    "./wasm-image-optimization.js": "./dist/wasm-image-optimization.js",
+    "./wasm-image-optimization.wasm": "./dist/wasm-image-optimization.wasm"
+  },
+  "typesVersions": {
+    "*": {
+      "workers": [
+        "./dist/workers.d.ts"
+      ],
+      "workerd": [
+        "./dist/workerd.d.ts"
+      ],
+      "single": [
+        "./dist/single.d.ts"
+      ],
+      "*": [
+        "./dist/single.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "author": "SoraKumo <info@croud.jp>",
+  "license": "MIT",
+  "keywords": [
+    "image",
+    "converter",
+    "webp",
+    "png",
+    "jpeg",
+    "avif",
+    "wasm",
+    "skia",
+    "webassembly"
+  ],
+  "devDependencies": {
+    "rolldown": "1.0.0-rc.7",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "dependencies": {
+    "commander": "14.0.3",
+    "worker-lib": "2.2.0"
+  }
+}
