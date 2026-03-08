@@ -50,7 +50,7 @@ export enum FitMode {
 }
 
 export type OptimizeParams = {
-  image: Uint8Array | ArrayBuffer;
+  image: Uint8Array | ArrayBuffer | string;
   width?: number;
   height?: number;
   fit?: "contain" | "cover" | "fill";
@@ -202,7 +202,9 @@ export abstract class ImageConverterBase {
     const image =
       imageInput instanceof Uint8Array
         ? imageInput
-        : new Uint8Array(imageInput);
+        : typeof imageInput === "string"
+          ? new TextEncoder().encode(imageInput)
+          : new Uint8Array(imageInput);
     try {
       if (!mod.load_image(inst, image)) {
         throw new Error("Failed to load image");

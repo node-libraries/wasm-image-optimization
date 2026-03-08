@@ -163,7 +163,7 @@ set(COMMON_LINK_OPTIONS
     "-sMODULARIZE=1"
     "-sEXPORT_ES6=1"
     "-sEXPORT_NAME='createImageConverterModule'"
-    "-sENVIRONMENT=web,worker,node"
+    "-sENVIRONMENT=web,worker"
     "-sFILESYSTEM=0"
     "-sERROR_ON_UNDEFINED_SYMBOLS=0"
     "-sWARN_ON_UNDEFINED_SYMBOLS=1"

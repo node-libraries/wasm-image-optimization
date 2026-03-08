@@ -47,9 +47,15 @@ const createImageConverterWorker = (params?: {
     get(target, prop, receiver) {
       if (prop === "optimizeImage") {
         return async (options: OptimizeParams): Promise<OptimizeResult> => {
+          const image =
+            options.image instanceof Uint8Array
+              ? options.image
+              : typeof options.image === "string"
+                ? new TextEncoder().encode(options.image)
+                : new Uint8Array(options.image);
           return await target.execute("optimizeImage", {
             ...options,
-            image: new Uint8Array(options.image),
+            image,
           } as any);
         };
       }

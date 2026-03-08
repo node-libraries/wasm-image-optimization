@@ -1,0 +1,25 @@
+{
+  "name": "cloudflare-ogp",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260307.1",
+    "@types/emscripten": "^1.41.5",
+    "@types/react": "^19.2.14",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.71.0"
+  },
+  "dependencies": {
+    "react": "^19.2.4",
+    "satori": "0.25.0",
+    "wasm-image-optimization": "workspace:*"
+  },
+  "repository": "https://github.com/SoraKumo001/cloudflare-ogp",
+  "author": "SoraKumo <info@croud.jp>",
+  "license": "MIT"
+}
