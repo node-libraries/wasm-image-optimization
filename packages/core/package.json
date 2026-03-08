@@ -1,6 +1,6 @@
 {
   "name": "wasm-image-optimization",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "Optimize images with wasm on edge runtime",
   "type": "module",
   "main": "./dist/index.js",
@@ -92,5 +92,5 @@
     "worker-lib": "2.2.0"
   },
   "repository": "https://github.com/node-libraries/wasm-image-optimization",
-  "homepage": "https://github.com/node-libraries/wasm-image-optimization/packages/core#readme"
+  "homepage": "https://github.com/node-libraries/wasm-image-optimization/tree/master/packages/core#readme"
 }
