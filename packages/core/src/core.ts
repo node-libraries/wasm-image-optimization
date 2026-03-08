@@ -214,11 +214,11 @@ export abstract class ImageConverterBase {
       const originalFormat = mod.get_original_format(inst);
 
       let targetFormat = format || "webp";
-      if (animation && originalAnimation) {
+      if (targetFormat !== "none" && animation && originalAnimation) {
         targetFormat = "webp";
       }
 
-      if (width || height) {
+      if (targetFormat !== "none" && (width || height)) {
         const fitMap: Record<string, number> = {
           contain: FitMode.Contain,
           cover: FitMode.Cover,
