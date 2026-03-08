@@ -25,7 +25,7 @@ const main = async () => {
         const label = `[${file}] -> [${format}]`;
         console.time(label);
         return optimizeImage({
-          image,
+          image: new Uint8Array(image),
           quality: 100,
           format,
           width: 512,
@@ -38,6 +38,9 @@ const main = async () => {
             const fileName = file.split(".")[0];
             fs.writeFile(`image_output/${fileName}.${format}`, data);
           }
+        }).catch(err => {
+          console.error(`Error in ${label}:`, err);
+          throw err;
         });
       });
       return Promise.all(p);

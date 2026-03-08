@@ -189,6 +189,7 @@ file(GLOB SKIA_CORE_SRC
     "${skia_SOURCE_DIR}/src/image/*.cpp"
     "${skia_SOURCE_DIR}/src/shaders/*.cpp"
     "${skia_SOURCE_DIR}/src/shaders/gradients/*.cpp"
+    "${skia_SOURCE_DIR}/src/pathops/*.cpp"
     "${skia_SOURCE_DIR}/src/effects/*.cpp"
     "${skia_SOURCE_DIR}/src/effects/imagefilters/*.cpp"
     "${skia_SOURCE_DIR}/src/svg/*.cpp"

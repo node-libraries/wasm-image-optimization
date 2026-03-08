@@ -78,15 +78,6 @@ void _ZN9SkOTUtils26LocalizedStrings_NameTable18MakeForFamilyNamesERK10SkTypefac
     }
 }
 
-// PathOps
-bool _Z2OpRK6SkPathS1_8SkPathOp(void* one, void* two, int op, void* result) {
-    if (result) {
-        // Initialize the result path to be empty
-        new (result) SkPath();
-    }
-    return true;
-}
-
 // ImageFilters & ColorFilters Registration
 void _Z36SkRegisterBlurImageFilterFlattenablev() {}
 void _Z36SkRegisterCropImageFilterFlattenablev() {}
