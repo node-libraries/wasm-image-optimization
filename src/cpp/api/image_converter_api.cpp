@@ -81,11 +81,6 @@ bool ImageConverterInstance::load_image(const uint8_t* data, size_t size) {
         int frameCount = codec->getFrameCount();
         SkEncodedOrigin origin = codec->getOrigin();
         bool swapDimensions = SkEncodedOriginSwapsWidthHeight(origin);
-        if (g_log_level >= 3) {
-            char buf[128];
-            snprintf(buf, sizeof(buf), "Codec origin: %d, swap: %d", (int)origin, swapDimensions);
-            image_converter_log(LogLevel::Info, buf);
-        }
 
         SkImageInfo info = codec->getInfo().makeColorType(kN32_SkColorType).makeAlphaType(kPremul_SkAlphaType);
         
@@ -143,15 +138,18 @@ bool ImageConverterInstance::load_image(const uint8_t* data, size_t size) {
     // Try SVG
     SkMemoryStream stream(sk_data);
     auto resource_provider = skresources::DataURIResourceProviderProxy::Make(
-        nullptr, skresources::ImageDecodeStrategy::kPreDecode);
+        nullptr, skresources::ImageDecodeStrategy::kLazyDecode);
     auto svg_dom = SkSVGDOM::Builder()
                        .setResourceProvider(std::move(resource_provider))
+                       .setFontManager(SkFontMgr::RefEmpty())
                        .make(stream);
     if (svg_dom) {
         auto container_size = svg_dom->containerSize();
         if (container_size.isEmpty()) {
             container_size = SkSize::Make(512, 512); // Fallback
         }
+        svg_dom->setContainerSize(container_size);
+        
         original_width = (int)container_size.width();
         original_height = (int)container_size.height();
         original_animation = false;
@@ -487,9 +485,25 @@ static sk_sp<SkData> patch_svg_data(const sk_sp<SkData>& data) {
         }
     }
 
-    if (g_log_level >= 4) {
-        image_converter_log(LogLevel::Debug, "Patched SVG:");
-        image_converter_log(LogLevel::Debug, svg.c_str());
+    // 3. Patch href to xlink:href for embedded images and add xlink namespace if needed
+    {
+        std::regex re("(<image[^>]*?)\\s+href=\"data:([^/]+/[^;]+;base64,[^\"]+)\"");
+        std::string result = std::regex_replace(svg, re, "$1 xlink:href=\"data:$2\"");
+        if (result != svg) {
+            svg = result;
+            changed = true;
+            
+            // Ensure xmlns:xlink is present
+            if (svg.find("xmlns:xlink") == std::string::npos) {
+                size_t pos = svg.find("<svg");
+                if (pos != std::string::npos) {
+                    size_t end_pos = svg.find(">", pos);
+                    if (end_pos != std::string::npos) {
+                        svg.insert(end_pos, " xmlns:xlink=\"http://www.w3.org/1999/xlink\"");
+                    }
+                }
+            }
+        }
     }
 
     if (!changed) return data;
