@@ -56,11 +56,18 @@ FetchContent_Declare(
 FetchContent_GetProperties(libaom)
 if(NOT libaom_POPULATED)
     FetchContent_Populate(libaom)
+    
+    # Save current flags and suppress all warnings for libaom
+    set(OLD_CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+    set(OLD_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+    
     add_subdirectory(${libaom_SOURCE_DIR} ${libaom_BINARY_DIR} EXCLUDE_FROM_ALL)
-    # Suppress warnings in libaom
-    if(TARGET aom)
-        target_compile_options(aom PRIVATE -Wno-unreachable-code -Wno-unreachable-code-break -Wno-unreachable-code-return)
-    endif()
+    
+    # Restore flags
+    set(CMAKE_C_FLAGS ${OLD_CMAKE_C_FLAGS})
+    set(CMAKE_CXX_FLAGS ${OLD_CMAKE_CXX_FLAGS})
 endif()
 
 # --- libavif ---
@@ -80,7 +87,19 @@ FetchContent_Declare(
 )
 
 set(CMAKE_SKIP_INSTALL_RULES ON)
+
+# Save current flags and suppress all warnings for libavif
+set(OLD_CMAKE_C_FLAGS ${CMAKE_C_FLAGS})
+set(OLD_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+
 FetchContent_MakeAvailable(libavif)
+
+# Restore flags
+set(CMAKE_C_FLAGS ${OLD_CMAKE_C_FLAGS})
+set(CMAKE_CXX_FLAGS ${OLD_CMAKE_CXX_FLAGS})
+
 set(CMAKE_SKIP_INSTALL_RULES OFF)
 
 # Manually fix libavif missing include directories for aom
@@ -127,9 +146,7 @@ set(COMMON_COMPILE_OPTIONS
     -fexceptions
     -msimd128
     -flto=thin
-    -Wno-unreachable-code
-    -Wno-unreachable-code-break
-    -Wno-unreachable-code-return
+    -Wno-unknown-warning-option
 )
 set(COMMON_LINK_OPTIONS
     "--bind"
@@ -240,7 +257,7 @@ target_include_directories(skia_lib PUBLIC
     "${skia_SOURCE_DIR}/modules/skresources/include"
 )
 target_compile_definitions(skia_lib PUBLIC SK_USER_CONFIG_HEADER="SkUserConfig.h" SK_ENABLE_SVG SK_DISABLE_FILESYSTEM SKCMS_PORTABLE)
-target_compile_options(skia_lib PRIVATE ${COMMON_COMPILE_OPTIONS} -Wno-unused-parameter)
+target_compile_options(skia_lib PRIVATE ${COMMON_COMPILE_OPTIONS} -w)
 target_link_libraries(skia_lib PUBLIC ${IMAGE_CONVERTER_LIBS})
 
 # --- Target: image_converter_core ---

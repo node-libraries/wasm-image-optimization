@@ -152,7 +152,9 @@ const AsyncImage: FC<{
     [image],
   );
   const filename =
-    format === "none" ? file.name : file.name.replace(/\.\w+$/, `.${format}`);
+    !image || format === "none"
+      ? file.name
+      : file.name.replace(/\.\w+$/, `.${image.format}`);
   return (
     <div className="border border-gray-300 rounded-4 overflow-hidden relative w-64 h-64 grid">
       {image === undefined && <div>Error</div>}
@@ -165,9 +167,7 @@ const AsyncImage: FC<{
             />
           </a>
           <div className="bg-white/80 w-full z-10 text-right p-0 absolute bottom-0 font-bold">
-            <div>
-              [{image.format}]{filename}
-            </div>
+            <div>{filename}</div>
             <div>{time?.toLocaleString()}ms</div>
             <div>
               {format !== "none" ? "Optimize" : "Original"}:{" "}

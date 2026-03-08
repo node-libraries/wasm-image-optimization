@@ -1,0 +1,8 @@
+name = "cloudflare-image"
+main = "src/index.ts"
+compatibility_date = "2023-12-29"
+[observability.logs]
+enabled = true
+
+[limits]
+cpu_ms = 10000

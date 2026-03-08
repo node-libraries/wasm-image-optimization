@@ -1,0 +1,32 @@
+{
+  "name": "cloudflare-workers-image-optimization",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "lint": "eslint src",
+    "lint:fix": "eslint --fix src && prettier -w src"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260307.1",
+    "@eslint/js": "10.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.56.1",
+    "@typescript-eslint/parser": "^8.56.1",
+    "eslint": "10.0.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1",
+    "wrangler": "^4.71.0"
+  },
+  "dependencies": {
+    "wasm-image-optimization": "workspace:*"
+  },
+  "main": "index.js",
+  "repository": "https://github.com/SoraKumo001/cloudflare-workers-image-optimization",
+  "author": "SoraKumo <info@croud.jp>",
+  "license": "MIT"
+}

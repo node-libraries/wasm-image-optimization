@@ -10,7 +10,7 @@ import {
 export * from "./core.js";
 
 // @ts-ignore
-import satoruWasm from "../dist/satoru.wasm";
+import satoruWasm from "../dist/wasm-image-optimization.wasm";
 
 /**
  * Cloudflare Workers (workerd) specialized wrapper for Satoru.

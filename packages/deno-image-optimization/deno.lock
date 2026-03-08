@@ -1,0 +1,29 @@
+{
+  "version": "5",
+  "specifiers": {
+    "npm:wasm-image-optimization@1.4.4": "1.4.4"
+  },
+  "npm": {
+    "mkdirp@3.0.1": {
+      "integrity": "sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg==",
+      "bin": true
+    },
+    "wasm-image-optimization@1.4.4": {
+      "integrity": "sha512-lx3mgBaL1Zg+hjY2y1pwklWrTAyeF9UIFR0K54pxZvmr9L+M+sUwLM4EAWXFnUf/WG8PNcq+vUq8OMqs3vgfig==",
+      "dependencies": [
+        "mkdirp",
+        "worker-lib"
+      ]
+    },
+    "worker-lib@2.0.8": {
+      "integrity": "sha512-nMx5ut10AaJZ1jf/4OJmIae9vvRP+Q134tWZ6h/TAjDhSeIHaRPH9SCuN0Wmacs3nZMZNzEQEA7hCGiQ68cHTg=="
+    }
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:wasm-image-optimization@1.4.4"
+      ]
+    }
+  }
+}
