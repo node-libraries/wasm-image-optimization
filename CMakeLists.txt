@@ -168,7 +168,6 @@ set(COMMON_LINK_OPTIONS
     "-sERROR_ON_UNDEFINED_SYMBOLS=0"
     "-sWARN_ON_UNDEFINED_SYMBOLS=1"
     "-sALLOW_MEMORY_GROWTH=1"
-    "-sSTACK_SIZE=5MB"
 )
 
 # --- Target: skia_lib ---
