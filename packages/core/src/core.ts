@@ -75,45 +75,67 @@ export type OptimizeResult = {
 export abstract class ImageConverterBase {
   private factory: any;
   private modPromise?: Promise<ImageConverterModule>;
+  private _onLog?: (level: LogLevel, message: string) => void;
+  private _logLevel: LogLevel = LogLevel.None;
 
   protected constructor(factory: any) {
     this.factory = factory;
   }
 
+  get onLog() {
+    return this._onLog;
+  }
+
+  set onLog(val) {
+    this._onLog = val;
+    this.getModule().then((mod) => {
+      mod.onLog = val;
+    });
+  }
+
+  get logLevel() {
+    return this._logLevel;
+  }
+
+  set logLevel(val) {
+    this._logLevel = val;
+    this.getModule().then((mod) => {
+      mod.logLevel = val;
+    });
+  }
+
   private async getModule(): Promise<ImageConverterModule> {
     if (!this.modPromise) {
       this.modPromise = (async () => {
-        let currentLogLevel = LogLevel.None;
-        let currentUserOnLog:
-          | ((level: LogLevel, message: string) => void)
-          | undefined;
+        let currentLogLevel = this._logLevel;
+        let currentUserOnLog = this._onLog;
 
         const initialModule: any = {
           onLog: (level: LogLevel, message: string) => {
             if (
-              currentLogLevel !== LogLevel.None &&
-              level <= currentLogLevel &&
-              currentUserOnLog
+              this._logLevel !== LogLevel.None &&
+              level <= this._logLevel &&
+              this._onLog
             ) {
-              currentUserOnLog(level, message);
+              this._onLog(level, message);
             }
           },
           print: (text: string) => {
             if (
-              currentLogLevel !== LogLevel.None &&
-              LogLevel.Info <= currentLogLevel &&
-              currentUserOnLog
+              this._logLevel !== LogLevel.None &&
+              LogLevel.Info <= this._logLevel &&
+              this._onLog
             ) {
-              currentUserOnLog(LogLevel.Info, text);
+              this._onLog(LogLevel.Info, text);
             }
           },
           printErr: (text: string) => {
             if (
-              currentLogLevel !== LogLevel.None &&
-              LogLevel.Error <= currentLogLevel &&
-              currentUserOnLog
+              this._logLevel !== LogLevel.None &&
+              LogLevel.Error <= this._logLevel &&
+              this._onLog
             ) {
-              currentUserOnLog(LogLevel.Error, text);
+              this._onLog(LogLevel.Error, text);
             }
           },
         };
@@ -122,11 +144,17 @@ export abstract class ImageConverterBase {
           initialModule,
         )) as ImageConverterModule;
 
-        mod.logLevel = LogLevel.None;
+        mod.set_log_level(this._logLevel);
+
+        // In modularized mode, the factory returns the module object.
+        // EM_JS might be looking for functions on this object.
+        (mod as any).onLog = initialModule.onLog;
+
+        mod.logLevel = this._logLevel;
 
         const originalSetLogLevel = mod.set_log_level;
         mod.set_log_level = (level: number) => {
-          currentLogLevel = level;
+          this._logLevel = level;
           originalSetLogLevel(level);
         };
 
@@ -135,7 +163,7 @@ export abstract class ImageConverterBase {
           get: () => internalOnLog,
           set: (val) => {
             internalOnLog = val;
-            currentUserOnLog = val;
+            this._onLog = val;
           },
         });
 
@@ -144,7 +172,7 @@ export abstract class ImageConverterBase {
           get: () => internalLogLevel,
           set: (val) => {
             internalLogLevel = val;
-            currentLogLevel = val;
+            this._logLevel = val;
           },
         });
 
@@ -155,8 +183,7 @@ export abstract class ImageConverterBase {
   }
 
   async setLogLevel(level: LogLevel): Promise<void> {
-    const mod = await this.getModule();
-    mod.set_log_level(level);
+    this.logLevel = level;
   }
 
   async optimizeImage(params: OptimizeParams): Promise<OptimizeResult> {

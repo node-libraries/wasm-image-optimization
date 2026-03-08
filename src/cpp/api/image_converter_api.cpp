@@ -6,6 +6,8 @@
 #include <algorithm>
 
 #include "include/codec/SkCodec.h"
+#include "include/codec/SkEncodedOrigin.h"
+#include "include/codec/SkPixmapUtils.h"
 #include "include/codec/SkPngDecoder.h"
 #include "include/codec/SkJpegDecoder.h"
 #include "include/codec/SkWebpDecoder.h"
@@ -34,10 +36,16 @@
 
 extern "C" {
 EM_JS(void, js_on_log, (int level, const char* message), {
+    const msg = UTF8ToString(message);
     if (typeof onLog === 'function') {
-        onLog(level, UTF8ToString(message));
+        onLog(level, msg);
     } else if (typeof Module !== 'undefined' && typeof Module.onLog === 'function') {
-        Module.onLog(level, UTF8ToString(message));
+        Module.onLog(level, msg);
+    } else {
+        // Fallback to console if no handler is found
+        if (level <= 1) console.error(msg);
+        else if (level == 2) console.warn(msg);
+        else console.log(msg);
     }
 })
 }
@@ -66,9 +74,23 @@ bool ImageConverterInstance::load_image(const uint8_t* data, size_t size) {
     std::unique_ptr<SkCodec> codec = SkCodec::MakeFromData(sk_data);
     if (codec) {
         int frameCount = codec->getFrameCount();
+        SkEncodedOrigin origin = codec->getOrigin();
+        bool swapDimensions = SkEncodedOriginSwapsWidthHeight(origin);
+        if (g_log_level >= 3) {
+            char buf[128];
+            snprintf(buf, sizeof(buf), "Codec origin: %d, swap: %d", (int)origin, swapDimensions);
+            image_converter_log(LogLevel::Info, buf);
+        }
+
         SkImageInfo info = codec->getInfo().makeColorType(kN32_SkColorType).makeAlphaType(kPremul_SkAlphaType);
-        original_width = info.width();
-        original_height = info.height();
+        
+        if (swapDimensions) {
+            original_width = info.height();
+            original_height = info.width();
+        } else {
+            original_width = info.width();
+            original_height = info.height();
+        }
         original_animation = frameCount > 1;
 
         auto encoded_format = codec->getEncodedFormat();
@@ -83,16 +105,31 @@ bool ImageConverterInstance::load_image(const uint8_t* data, size_t size) {
         }
 
         for (int i = 0; i < frameCount; ++i) {
-            SkBitmap bitmap;
-            bitmap.allocPixels(info);
+            SkBitmap decodedBitmap;
+            decodedBitmap.allocPixels(info);
 
             SkCodec::Options options;
             options.fFrameIndex = i;
             
-            if (codec->getPixels(info, bitmap.getPixels(), bitmap.rowBytes(), &options) == SkCodec::kSuccess) {
+            if (codec->getPixels(info, decodedBitmap.getPixels(), decodedBitmap.rowBytes(), &options) == SkCodec::kSuccess) {
                 SkCodec::FrameInfo frameInfo;
                 codec->getFrameInfo(i, &frameInfo);
-                frames.push_back({std::move(bitmap), frameInfo.fDuration});
+
+                if (origin != kDefault_SkEncodedOrigin) {
+                    SkBitmap orientedBitmap;
+                    SkImageInfo orientedInfo = info;
+                    if (swapDimensions) {
+                        orientedInfo = orientedInfo.makeWH(info.height(), info.width());
+                    }
+                    orientedBitmap.allocPixels(orientedInfo);
+                    if (SkPixmapUtils::Orient(orientedBitmap.pixmap(), decodedBitmap.pixmap(), origin)) {
+                        frames.push_back({std::move(orientedBitmap), frameInfo.fDuration});
+                    } else {
+                        frames.push_back({std::move(decodedBitmap), frameInfo.fDuration});
+                    }
+                } else {
+                    frames.push_back({std::move(decodedBitmap), frameInfo.fDuration});
+                }
             }
         }
         return !frames.empty();
