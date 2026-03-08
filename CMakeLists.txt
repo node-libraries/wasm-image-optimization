@@ -36,8 +36,8 @@ FetchContent_MakeAvailable(skia)
 set(VCPKG_INSTALLED_DIR "${CMAKE_BINARY_DIR}/vcpkg_installed/wasm32-emscripten-wasm-eh")
 
 # --- libaom ---
-set(PERL_EXECUTABLE "C:/vcpkg/downloads/tools/perl/5.42.0.1/perl/bin/perl.exe" CACHE FILEPATH "" FORCE)
-set(CMAKE_ASM_NASM_COMPILER "C:/vcpkg/downloads/tools/nasm/nasm-3.01/nasm.exe" CACHE FILEPATH "" FORCE)
+find_package(Perl REQUIRED)
+set(PERL_EXECUTABLE ${PERL_EXECUTABLE} CACHE FILEPATH "" FORCE)
 set(AOM_TARGET_CPU "generic" CACHE STRING "" FORCE)
 set(ENABLE_DOCS OFF CACHE BOOL "" FORCE)
 set(ENABLE_TESTS OFF CACHE BOOL "" FORCE)
