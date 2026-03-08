@@ -1,5 +1,6 @@
 #include <stdint.h>
-
+#include "include/core/SkPath.h"
+#include "include/core/SkRect.h"
 #include "include/private/base/SkSemaphore.h"
 
 #pragma clang diagnostic push
@@ -78,7 +79,13 @@ void _ZN9SkOTUtils26LocalizedStrings_NameTable18MakeForFamilyNamesERK10SkTypefac
 }
 
 // PathOps
-void _Z2OpRK6SkPathS1_8SkPathOp() {}
+bool _Z2OpRK6SkPathS1_8SkPathOp(void* one, void* two, int op, void* result) {
+    if (result) {
+        // Initialize the result path to be empty
+        new (result) SkPath();
+    }
+    return true;
+}
 
 // ImageFilters & ColorFilters Registration
 void _Z36SkRegisterBlurImageFilterFlattenablev() {}
@@ -124,7 +131,11 @@ void _ZN14SkImageFilters15SpotLitSpecularERK8SkPoint3S2_ffjfff5sk_spI13SkImageFi
 void _ZN14SkImageFilters16PointLitSpecularERK8SkPoint3jfff5sk_spI13SkImageFilterERKNS_8CropRectE() {}
 void _ZN14SkImageFilters17DistantLitDiffuseERK8SkPoint3jff5sk_spI13SkImageFilterERKNS_8CropRectE() {}
 void _ZN14SkImageFilters18DistantLitSpecularERK8SkPoint3jfff5sk_spI13SkImageFilterERKNS_8CropRectE() {}
-void _ZN14SkImageFilters4BlurEff10SkTileMode5sk_spI13SkImageFilterERKNS_8CropRectE() {}
+void _ZN14SkImageFilters4BlurEff10SkTileMode5sk_spI13SkImageFilterERKNS_8CropRectE(void* res, float f1, float f2, int tm, void* sp, void* cr) {
+    if (res) {
+        *(void**)res = nullptr;
+    }
+}
 void _ZN14SkImageFilters5BlendE11SkBlendMode5sk_spI13SkImageFilterES3_RKNS_8CropRectE() {}
 void _ZN14SkImageFilters5ErodeEff5sk_spI13SkImageFilterERKNS_8CropRectE() {}
 void _ZN14SkImageFilters5ImageE5sk_spI7SkImageERK6SkRectS5_RK17SkSamplingOptions() {}

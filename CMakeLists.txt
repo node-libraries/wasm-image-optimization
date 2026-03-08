@@ -163,11 +163,12 @@ set(COMMON_LINK_OPTIONS
     "-sMODULARIZE=1"
     "-sEXPORT_ES6=1"
     "-sEXPORT_NAME='createImageConverterModule'"
-    "-sENVIRONMENT=web,worker"
+    "-sENVIRONMENT=web,worker,node"
     "-sFILESYSTEM=0"
     "-sERROR_ON_UNDEFINED_SYMBOLS=0"
     "-sWARN_ON_UNDEFINED_SYMBOLS=1"
     "-sALLOW_MEMORY_GROWTH=1"
+    "-sSTACK_SIZE=5MB"
 )
 
 # --- Target: skia_lib ---
@@ -188,7 +189,8 @@ file(GLOB SKIA_CORE_SRC
     "${skia_SOURCE_DIR}/src/image/*.cpp"
     "${skia_SOURCE_DIR}/src/shaders/*.cpp"
     "${skia_SOURCE_DIR}/src/shaders/gradients/*.cpp"
-    "${skia_SOURCE_DIR}/src/effects/SkColorMatrixFilter.cpp"
+    "${skia_SOURCE_DIR}/src/effects/*.cpp"
+    "${skia_SOURCE_DIR}/src/effects/imagefilters/*.cpp"
     "${skia_SOURCE_DIR}/src/svg/*.cpp"
     "${skia_SOURCE_DIR}/src/xml/*.cpp"
     "${skia_SOURCE_DIR}/src/text/*.cpp"
@@ -289,7 +291,7 @@ set_target_properties(image_converter PROPERTIES
 
 add_executable(image_converter_single $<TARGET_OBJECTS:image_converter_core>)
 target_link_libraries(image_converter_single PRIVATE skia_lib)
-target_link_options(image_converter_single PRIVATE ${COMMON_LINK_OPTIONS} "-sSINGLE_FILE=1" "-sENVIRONMENT=web,worker")
+target_link_options(image_converter_single PRIVATE ${COMMON_LINK_OPTIONS} "-sSINGLE_FILE=1" "-sENVIRONMENT=web,worker,node")
 set_target_properties(image_converter_single PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/packages/core/dist"
     OUTPUT_NAME "wasm-image-optimization-single"
