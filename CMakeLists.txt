@@ -186,15 +186,24 @@ file(GLOB SKIA_CORE_SRC
     "${skia_SOURCE_DIR}/src/ports/SkFontMgr_custom_empty.cpp"
     "${skia_SOURCE_DIR}/src/ports/SkLog_stdio.cpp"
     "${skia_SOURCE_DIR}/src/ports/SkGlobalInitialization_default.cpp"
+    "${skia_SOURCE_DIR}/src/core/SkRuntimeBlender.cpp"
     "${skia_SOURCE_DIR}/src/image/*.cpp"
     "${skia_SOURCE_DIR}/src/shaders/*.cpp"
     "${skia_SOURCE_DIR}/src/shaders/gradients/*.cpp"
     "${skia_SOURCE_DIR}/src/pathops/*.cpp"
     "${skia_SOURCE_DIR}/src/effects/*.cpp"
+    "${skia_SOURCE_DIR}/src/effects/colorfilters/*.cpp"
     "${skia_SOURCE_DIR}/src/effects/imagefilters/*.cpp"
     "${skia_SOURCE_DIR}/src/svg/*.cpp"
     "${skia_SOURCE_DIR}/src/xml/*.cpp"
     "${skia_SOURCE_DIR}/src/text/*.cpp"
+    "${skia_SOURCE_DIR}/src/sksl/*.cpp"
+    "${skia_SOURCE_DIR}/src/sksl/analysis/*.cpp"
+    "${skia_SOURCE_DIR}/src/sksl/codegen/SkSLRasterPipelineBuilder.cpp"
+    "${skia_SOURCE_DIR}/src/sksl/codegen/SkSLRasterPipelineCodeGenerator.cpp"
+    "${skia_SOURCE_DIR}/src/sksl/ir/*.cpp"
+    "${skia_SOURCE_DIR}/src/sksl/transform/*.cpp"
+    "${skia_SOURCE_DIR}/src/sksl/tracing/*.cpp"
     "${skia_SOURCE_DIR}/modules/skcms/skcms.cc"
     "${skia_SOURCE_DIR}/modules/skcms/src/skcms_TransformBaseline.cc"
     "${skia_SOURCE_DIR}/src/encode/SkEncoder.cpp"
@@ -249,7 +258,7 @@ file(GLOB SKIA_CORE_SRC
     "${skia_SOURCE_DIR}/modules/skshaper/src/SkShaper_factory.cpp"
 )
 list(FILTER SKIA_CORE_SRC EXCLUDE REGEX ".*_win.cpp|.*_mac.cpp|.*_linux.cpp|.*_android.cpp|.*_ios.cpp")
-list(FILTER SKIA_CORE_SRC EXCLUDE REGEX ".*SkGetExecutablePath.*|.*SkThread.*|.*SkSemaphore.*|.*SkRuntimeEffect.*|.*SkMesh.*|.*SkRuntimeBlender.*|.*SkSL.*|.*SkGPU.*|.*SkGpu.*|.*SkGraphite.*|.*SkDocument_PDF_None.cpp|.*src/gpu/.*|.*src/graphite/.*")
+list(FILTER SKIA_CORE_SRC EXCLUDE REGEX ".*SkGetExecutablePath.*|.*SkThread.*|.*SkSemaphore.*|.*SkMesh.*|.*SkGPU.*|.*SkGpu.*|.*SkGraphite.*|.*SkDocument_PDF_None.cpp|.*src/gpu/.*|.*src/graphite/.*")
 
 target_sources(skia_lib PRIVATE ${SKIA_CORE_SRC})
 target_include_directories(skia_lib PUBLIC

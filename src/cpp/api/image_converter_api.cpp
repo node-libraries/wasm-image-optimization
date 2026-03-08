@@ -34,6 +34,9 @@
 
 #include <cstdio>
 
+#include <string>
+#include <regex>
+
 extern "C" {
 EM_JS(void, js_on_log, (int level, const char* message), {
     const msg = UTF8ToString(message);
@@ -367,8 +370,132 @@ ImageConverterInstance* api_create_instance() { return new ImageConverterInstanc
 
 void api_destroy_instance(ImageConverterInstance* inst) { delete inst; }
 
+static sk_sp<SkData> patch_svg_data(const sk_sp<SkData>& data) {
+    std::string svg((const char*)data->data(), data->size());
+    bool changed = false;
+
+    // 1. Patch feDropShadow
+    {
+        std::regex re("<feDropShadow([^>]*?)/?>");
+        std::smatch m;
+        std::string result;
+        std::string::const_iterator searchStart(svg.cbegin());
+
+        while (std::regex_search(searchStart, svg.cend(), m, re)) {
+            changed = true;
+            result.append(searchStart, m[0].first);
+            
+            std::string attrs = m[1].str();
+            std::string dx = "0", dy = "0", stdDev = "0", floodColor = "black", floodOpacity = "1", in = "SourceGraphic";
+            
+            std::regex attr_re("([\\w-]+)\\s*=\\s*\"([^\"]*)\"");
+            std::smatch am;
+            std::string::const_iterator attrStart(attrs.cbegin());
+            while (std::regex_search(attrStart, attrs.cend(), am, attr_re)) {
+                std::string name = am[1].str();
+                std::string value = am[2].str();
+                if (name == "dx") dx = value;
+                else if (name == "dy") dy = value;
+                else if (name == "stdDeviation") stdDev = value;
+                else if (name == "flood-color") floodColor = value;
+                else if (name == "flood-opacity") floodOpacity = value;
+                else if (name == "in") in = value;
+                attrStart = am.suffix().first;
+            }
+
+            char buf[2048];
+            snprintf(buf, sizeof(buf),
+                "<feGaussianBlur in=\"%s\" stdDeviation=\"%s\" result=\"_dropShadowBlur\"/>"
+                "<feOffset in=\"_dropShadowBlur\" dx=\"%s\" dy=\"%s\" result=\"_dropShadowOffset\"/>"
+                "<feFlood flood-color=\"%s\" flood-opacity=\"%s\" result=\"_dropShadowFlood\"/>"
+                "<feComposite in=\"_dropShadowFlood\" in2=\"_dropShadowOffset\" operator=\"in\" result=\"_dropShadow\"/>"
+                "<feMerge><feMergeNode in=\"_dropShadow\"/><feMergeNode in=\"%s\"/></feMerge>",
+                in.c_str(), stdDev.c_str(), dx.c_str(), dy.c_str(), floodColor.c_str(), floodOpacity.c_str(), in.c_str());
+            
+            result.append(buf);
+            searchStart = m.suffix().first;
+        }
+        if (changed) {
+            result.append(searchStart, svg.cend());
+            svg = result;
+        }
+    }
+
+    // 2. Patch pattern containing linearGradient (Satori workaround)
+    {
+        // More robust pattern matching that doesn't rely on specific attribute order
+        std::regex pat_re("<pattern\\s+([^>]*?id=\"([^\"]+)\"[^>]*?)>(.*?)</pattern>");
+        std::smatch m;
+        std::string result;
+        std::string::const_iterator searchStart(svg.cbegin());
+        bool patternChanged = false;
+
+        while (std::regex_search(searchStart, svg.cend(), m, pat_re)) {
+            std::string patternAttrs = m[1].str();
+            std::string patternId = m[2].str();
+            std::string content = m[3].str();
+
+            if (patternAttrs.find("patternUnits=\"objectBoundingBox\"") != std::string::npos) {
+                std::regex grad_re("<linearGradient\\s+([^>]*?id=\"([^\"]+)\"[^>]*?)>(.*?)</linearGradient>");
+                std::smatch gm;
+                if (std::regex_search(content.cbegin(), content.cend(), gm, grad_re)) {
+                    patternChanged = true;
+                    changed = true;
+                    result.append(searchStart, m[0].first);
+
+                    std::string gradAttrsWithId = gm[1].str();
+                    std::string gradId = gm[2].str();
+                    std::string gradContent = gm[3].str();
+
+                    // Extract attributes without the ID to avoid duplicates
+                    std::string gradAttrs = std::regex_replace(gradAttrsWithId, std::regex("id=\"[^\"]+\""), "");
+
+                    // Put the linearGradient in place of the pattern
+                    result.append("<linearGradient id=\"");
+                    result.append(gradId);
+                    result.append("\" ");
+                    result.append(gradAttrs);
+                    result.append(">");
+                    result.append(gradContent);
+                    result.append("</linearGradient>");
+
+                    // Replace all references to this pattern with references to the nested gradient
+                    std::string ref = "url(#" + patternId + ")";
+                    std::string rep = "url(#" + gradId + ")";
+                    size_t pos = 0;
+                    while ((pos = svg.find(ref, pos)) != std::string::npos) {
+                        svg.replace(pos, ref.length(), rep);
+                        pos += rep.length();
+                    }
+                    searchStart = m.suffix().first;
+                    continue;
+                }
+            }
+            result.append(searchStart, m.suffix().first);
+            searchStart = m.suffix().first;
+        }
+
+        if (patternChanged) {
+            result.append(searchStart, svg.cend());
+            svg = result;
+        }
+    }
+
+    if (g_log_level >= 4) {
+        image_converter_log(LogLevel::Debug, "Patched SVG:");
+        image_converter_log(LogLevel::Debug, svg.c_str());
+    }
+
+    if (!changed) return data;
+    return SkData::MakeWithCopy(svg.c_str(), svg.size());
+}
+
 const uint8_t* api_load_image(ImageConverterInstance* inst, const uint8_t* data, size_t size) {
-    if (inst->load_image(data, size)) {
+    sk_sp<SkData> sk_data = SkData::MakeWithCopy(data, size);
+    if (size >= 4 && data[0] == '<') {
+        sk_data = patch_svg_data(sk_data);
+    }
+    if (inst->load_image((const uint8_t*)sk_data->data(), sk_data->size())) {
         return (const uint8_t*)1; // Success indicator
     }
     return nullptr;
