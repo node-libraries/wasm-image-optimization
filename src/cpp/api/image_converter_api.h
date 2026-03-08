@@ -19,6 +19,7 @@ class ImageConverterInstance {
    public:
     ImageConverterContext context;
     std::vector<ImageFrame> frames;
+    sk_sp<SkData> raw_data;
     sk_sp<SkData> original_data;
     int original_width = 0;
     int original_height = 0;

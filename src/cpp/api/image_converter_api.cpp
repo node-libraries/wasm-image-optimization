@@ -25,6 +25,8 @@
 #include "include/encode/SkJpegEncoder.h"
 
 // SVG support
+#include "include/core/SkFontMgr.h"
+#include "modules/skresources/include/SkResources.h"
 #include "modules/svg/include/SkSVGDOM.h"
 #include "modules/svg/include/SkSVGNode.h"
 #include "include/core/SkStream.h"
@@ -140,7 +142,11 @@ bool ImageConverterInstance::load_image(const uint8_t* data, size_t size) {
 
     // Try SVG
     SkMemoryStream stream(sk_data);
-    auto svg_dom = SkSVGDOM::MakeFromStream(stream);
+    auto resource_provider = skresources::DataURIResourceProviderProxy::Make(
+        nullptr, skresources::ImageDecodeStrategy::kPreDecode);
+    auto svg_dom = SkSVGDOM::Builder()
+                       .setResourceProvider(std::move(resource_provider))
+                       .make(stream);
     if (svg_dom) {
         auto container_size = svg_dom->containerSize();
         if (container_size.isEmpty()) {
@@ -180,10 +186,10 @@ const uint8_t* ImageConverterInstance::encode(RenderFormat format, float quality
 
     switch (format) {
         case RenderFormat::None: {
-            if (original_data) {
-                out_size = (int)original_data->size();
-                const uint8_t* bytes = original_data->bytes();
-                context.set_last_output(original_data);
+            if (raw_data) {
+                out_size = (int)raw_data->size();
+                const uint8_t* bytes = raw_data->bytes();
+                context.set_last_output(raw_data);
                 output_animation = original_animation;
                 output_format = original_format;
                 return bytes;
@@ -491,7 +497,8 @@ static sk_sp<SkData> patch_svg_data(const sk_sp<SkData>& data) {
 }
 
 const uint8_t* api_load_image(ImageConverterInstance* inst, const uint8_t* data, size_t size) {
-    sk_sp<SkData> sk_data = SkData::MakeWithCopy(data, size);
+    inst->raw_data = SkData::MakeWithCopy(data, size);
+    sk_sp<SkData> sk_data = inst->raw_data;
     if (size >= 4 && data[0] == '<') {
         sk_data = patch_svg_data(sk_data);
     }
