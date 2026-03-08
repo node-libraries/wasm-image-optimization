@@ -3,21 +3,15 @@
 High-performance image conversion and resizing tool leveraging WebAssembly (Emscripten).
 Built on the Skia rendering engine, it supports animations (GIF/WebP) and modern formats (AVIF/SVG/ThumbHash).
 
+It provides a lightweight, dependency-free solution for generating high-quality visuals and documents across **Node.js**, **Cloudflare Workers**, **Deno**, and **Web Browsers**.
+
 ## Playground
 
 https://node-libraries.github.io/wasm-image-optimization/
 
-## Features
+## Examples
 
-- **Multi-format Support**: Supports major raster formats and SVG loading.
-- **Animation Support**: Supports loading GIF and WebP animations. Animated WebP is recommended for output.
-- **High-Quality Resizing**: Supports `fit` options (`contain`, `cover`, `fill`) with aspect ratio preservation.
-- **Intelligent Animation Conversion**: Automatically switches the output format to `webp` if animations are enabled and the source is animated.
-- **Fast Execution**: High-speed image processing using C++20 and SIMD (`msimd128`).
-- **TypeScript Ready**: Provides type-safe wrappers for easy integration.
-- **Multi-threaded**: Supports parallel processing using Web Workers / Worker Threads.
-- **Multi-environment**: Works seamlessly across Node.js, Cloudflare Workers, Deno, and Browsers.
-- **Lightweight**: Optimized binary size (approx. 7.4MB for the single-file bundle) by removing unnecessary dependencies like FreeType.
+https://github.com/SoraKumo001/wasm-image-optimization-samples
 
 ## Supported Formats
 
@@ -81,19 +75,51 @@ const result = await optimizeImage({
   speed: 6,       // 0-10 (encoding speed for AVIF, etc.)
   animation: true // maintain animation if possible
 });
+```
 
-// Result structure
-// {
-//   data: Uint8Array,           // processed image data
-//   originalWidth: number,      // source width
-//   originalHeight: number,     // source height
-//   originalAnimation: boolean, // true if source was animated
-//   originalFormat: string,     // source format (e.g., "jpeg")
-//   width: number,              // output width
-//   height: number,             // output height
-//   animation: boolean,         // true if output is animated
-//   format: string              // output format
-// }
+### Parameters (`OptimizeParams`)
+
+| Parameter       | Type                               | Default      | Description                                                                                                                                                                      |
+| :-------------- | :--------------------------------- | :----------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`image`**     | `Uint8Array`<br>`ArrayBuffer`      | **Required** | The raw binary data of the image to process.                                                                                                                                     |
+| **`width`**     | `number`                           | -            | Target width for resizing. If omitted, it's calculated from `height` to maintain aspect ratio.                                                                                   |
+| **`height`**    | `number`                           | -            | Target height for resizing. If omitted, it's calculated from `width` to maintain aspect ratio.                                                                                   |
+| **`fit`**       | `contain` <br> `cover` <br> `fill` | `'contain'`  | Resizing strategy. <br> - `contain`: Fits within bounds (aspect ratio preserved). <br> - `cover`: Fills bounds (may crop). <br> - `fill`: Stretches to match bounds exactly.     |
+| **`format`**    | `string`                           | `'webp'`     | Output format: `'none'`, `'png'`, `'webp'`, `'jpeg'`, `'avif'`, `'raw'`, `'thumbhash'`. <br> _Note: If `animation: true` and the input is animated, this is forced to `'webp'`._ |
+| **`quality`**   | `number`                           | `100`        | Compression quality (0-100). Applies to WebP, JPEG, and AVIF.                                                                                                                    |
+| **`speed`**     | `number`                           | `6`          | Encoding speed (0-10). Primarily used for AVIF. Lower is slower but better compression.                                                                                          |
+| **`animation`** | `boolean`                          | `false`      | If `true`, preserves animation frames (e.g., GIF/animated WebP source).                                                                                                          |
+
+### Result (`OptimizeResult`)
+
+| Property                | Type         | Description                                          |
+| :---------------------- | :----------- | :--------------------------------------------------- |
+| **`data`**              | `Uint8Array` | The processed image data.                            |
+| **`originalWidth`**     | `number`     | Width of the input image.                            |
+| **`originalHeight`**    | `number`     | Height of the input image.                           |
+| **`originalAnimation`** | `boolean`    | `true` if the input image was animated.              |
+| **`originalFormat`**    | `string`     | Format of the input image (e.g., `"jpeg"`, `"gif"`). |
+| **`width`**             | `number`     | Width of the output image.                           |
+| **`height`**            | `number`     | Height of the output image.                          |
+| **`animation`**         | `boolean`    | `true` if the output image is animated.              |
+| **`format`**            | `string`     | Format of the output image.                          |
+
+### Logging & Debugging
+
+You can monitor the internal processing and Skia logs.
+
+```typescript
+import { ImageConverter } from "wasm-image-optimization";
+
+const converter = new ImageConverter();
+
+// Set log level: 0 (None), 1 (Error), 2 (Warning), 3 (Info), 4 (Debug)
+converter.logLevel = 3;
+
+// Custom log handler
+converter.onLog = (level, message) => {
+  console.log(`[ImageConverter][${level}] ${message}`);
+};
 ```
 
 ### Multi-threading (Workers)
@@ -107,20 +133,6 @@ const result = await optimizeImage({
   image: inputBuffer,
   width: 800,
   format: "png",
-});
-```
-
-### Cloudflare Workers
-
-Use the specialized `workerd` entry point for edge runtimes.
-
-```typescript
-import { optimizeImage } from "wasm-image-optimization/workerd";
-
-const result = await optimizeImage({
-  image: inputBuffer,
-  width: 800,
-  format: "avif",
 });
 ```
 
