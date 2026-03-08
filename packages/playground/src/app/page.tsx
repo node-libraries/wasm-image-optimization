@@ -165,7 +165,9 @@ const AsyncImage: FC<{
             />
           </a>
           <div className="bg-white/80 w-full z-10 text-right p-0 absolute bottom-0 font-bold">
-            <div>{filename}</div>
+            <div>
+              [{image.format}]{filename}
+            </div>
             <div>{time?.toLocaleString()}ms</div>
             <div>
               {format !== "none" ? "Optimize" : "Original"}:{" "}
