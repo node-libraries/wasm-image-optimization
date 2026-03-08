@@ -45,6 +45,7 @@ optimizeImage({
   format?: "jpeg" | "png" | "webp" | "avif" | "thumbhash" | "raw" | "none"; // The desired output format (optional)
   speed?: number; // The desired speed (0-10, Slow-Fast, Optional)
   filter?: boolean; // resize filter (default true)
+}
   ):
     Promise<
       ArrayBuffer>
@@ -57,6 +58,7 @@ optimizeImageExt({
   format?: "jpeg" | "png" | "webp" | "avif" | "thumbhash" | "raw" | "none"; // The desired output format (optional)
   speed?: number; // The desired speed (0-10, Slow-Fast, Optional)
   filter?: boolean; // resize filter (default true)
+}
   ):
     Promise<{
       data: Uint8Array,
