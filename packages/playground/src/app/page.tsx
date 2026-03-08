@@ -270,21 +270,6 @@ const Page = () => {
         />
         Quality(0-100): Avif, Jpeg, WebP
       </label>
-      <div className="flex gap-2 items-center">
-        Fit:
-        {fits.map((f) => (
-          <label key={f} className="flex gap-1 items-center">
-            <input
-              type="radio"
-              name="fit"
-              value={f}
-              checked={fit === f}
-              onChange={(e) => setFit(e.currentTarget.value as any)}
-            />
-            {f}
-          </label>
-        ))}
-      </div>
       <label className="flex gap-2 items-center">
         <input
           type="number"
@@ -318,6 +303,21 @@ const Page = () => {
         </div>
         Animation
       </label>
+      <div className="flex gap-2 items-center">
+        Fit:
+        {fits.map((f) => (
+          <label key={f} className="flex gap-1 items-center">
+            <input
+              type="radio"
+              name="fit"
+              value={f}
+              checked={fit === f}
+              onChange={(e) => setFit(e.currentTarget.value as any)}
+            />
+            {f}
+          </label>
+        ))}
+      </div>
       <div className="flex gap-2">
         {formats.map((format) => (
           <label key={format} className="flex gap-1 ">
