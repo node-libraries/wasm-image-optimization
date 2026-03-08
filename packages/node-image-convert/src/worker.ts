@@ -1,31 +1,33 @@
 import { promises as fs } from "node:fs";
 import {
   optimizeImage,
-  close,
-  setLimit,
+  waitAll,
   waitReady,
+  setLimit,
+  close,
+  launchWorker,
 } from "wasm-image-optimization/workers";
 
-const formats = ["webp", "jpeg", "png", "avif"] as const;
+const formats = ["webp", "jpeg", "png", "avif", "none"] as const;
 
-setLimit(4); // set worker limit
+setLimit(16);
 
 const main = async () => {
-  const title = "Multi thread";
-  console.time(title);
+  await launchWorker();
+
   await fs.mkdir("./image_output", { recursive: true });
   const files = await fs.readdir("./images");
-  const p = files.map(async (file) => {
+  const p = files.map((file) => {
     return fs.readFile(`./images/${file}`).then((image) => {
       console.log(
-        `${file} ${Math.ceil(image.length / 1024).toLocaleString()}KB`,
+        `${file} ${Math.floor(image.length / 1024).toLocaleString()}KB`,
       );
       const p = formats.map(async (format) => {
         await waitReady();
         const label = `[${file}] -> [${format}]`;
         console.time(label);
         return optimizeImage({
-          image: new Uint8Array(image),
+          image,
           quality: 100,
           format,
           width: 512,
@@ -33,21 +35,58 @@ const main = async () => {
           if (data) {
             console.timeLog(
               label,
-              `${Math.ceil(data.length / 1024).toLocaleString()}KB`,
+              `${Math.floor(data.length / 1024).toLocaleString()}KB`,
             );
-            const fileName = file.split(".")[0];
-            fs.writeFile(`image_output/${fileName}.${format}`, data);
+            const fileName = file.split(".");
+            const filePath =
+              format === "none"
+                ? `image_output/${fileName[0]}_.${fileName[1]}`
+                : `image_output/${fileName[0]}.${format}`;
+            fs.writeFile(filePath, data);
           }
-        }).catch(err => {
-          console.error(`Error in ${label}:`, err);
-          throw err;
         });
       });
       return Promise.all(p);
     });
   });
   await Promise.all(p);
-  close(); // close worker
-  console.timeEnd(title);
+
+  for (let i = 0; i <= 8; i++) {
+    const data = await fetch(
+      `https://raw.githubusercontent.com/recurser/exif-orientation-examples/master/Landscape_${i}.jpg`,
+    ).then((res) => res.arrayBuffer());
+    optimizeImage({
+      image: data,
+      quality: 100,
+      format: "jpeg",
+      width: 300,
+    }).then(({ data }) => {
+      console.log(!!data, `Landscape_${i}.jpg`, "jpeg");
+      if (data) {
+        fs.writeFile(`image_output/Landscape_${i}.jpeg`, data);
+      }
+    });
+  }
+  await waitAll();
+
+  for (const file of files) {
+    await fs.readFile(`./images/${file}`).then((image) => {
+      const label = `[${file}]`;
+      console.time(label);
+      return optimizeImage({
+        image,
+        quality: 100,
+        format: "thumbhash",
+        // width: 100,
+        // height: 100,
+      }).then(({ data }) => {
+        if (data) {
+          console.timeLog(label, btoa(String.fromCharCode(...data)));
+        }
+      });
+    });
+  }
+
+  close();
 };
 main();
