@@ -37,7 +37,8 @@
 #include <cstdio>
 
 #include <string>
-#include <regex>
+#include <string_view>
+#include <ctre.hpp>
 
 extern "C" {
 EM_JS(void, js_on_log, (int level, const char* message), {
@@ -375,36 +376,35 @@ ImageConverterInstance* api_create_instance() { return new ImageConverterInstanc
 void api_destroy_instance(ImageConverterInstance* inst) { delete inst; }
 
 static sk_sp<SkData> patch_svg_data(const sk_sp<SkData>& data) {
-    std::string svg((const char*)data->data(), data->size());
+    std::string_view svg((const char*)data->data(), data->size());
+    std::string patched_svg;
     bool changed = false;
 
     // 1. Patch feDropShadow
     {
-        std::regex re("<feDropShadow([^>]*?)/?>");
-        std::smatch m;
         std::string result;
-        std::string::const_iterator searchStart(svg.cbegin());
+        std::string_view searchRange = svg;
+        bool step_changed = false;
 
-        while (std::regex_search(searchStart, svg.cend(), m, re)) {
+        while (auto m = ctre::search<"<feDropShadow([^>]*?)/?>">(searchRange)) {
+            step_changed = true;
             changed = true;
-            result.append(searchStart, m[0].first);
+            result.append(searchRange.substr(0, m.get<0>().begin() - searchRange.begin()));
             
-            std::string attrs = m[1].str();
+            std::string_view attrs = m.get<1>().to_view();
             std::string dx = "0", dy = "0", stdDev = "0", floodColor = "black", floodOpacity = "1", in = "SourceGraphic";
             
-            std::regex attr_re("([\\w-]+)\\s*=\\s*\"([^\"]*)\"");
-            std::smatch am;
-            std::string::const_iterator attrStart(attrs.cbegin());
-            while (std::regex_search(attrStart, attrs.cend(), am, attr_re)) {
-                std::string name = am[1].str();
-                std::string value = am[2].str();
-                if (name == "dx") dx = value;
-                else if (name == "dy") dy = value;
-                else if (name == "stdDeviation") stdDev = value;
-                else if (name == "flood-color") floodColor = value;
-                else if (name == "flood-opacity") floodOpacity = value;
-                else if (name == "in") in = value;
-                attrStart = am.suffix().first;
+            std::string_view attrSearchRange = attrs;
+            while (auto am = ctre::search<"([\\w\\-]+)\\s*=\\s*\"([^\"]*)\"">(attrSearchRange)) {
+                std::string_view name = am.get<1>().to_view();
+                std::string_view value = am.get<2>().to_view();
+                if (name == "dx") dx = std::string(value);
+                else if (name == "dy") dy = std::string(value);
+                else if (name == "stdDeviation") stdDev = std::string(value);
+                else if (name == "flood-color") floodColor = std::string(value);
+                else if (name == "flood-opacity") floodOpacity = std::string(value);
+                else if (name == "in") in = std::string(value);
+                attrSearchRange = attrSearchRange.substr(am.get<0>().end() - attrSearchRange.begin());
             }
 
             char buf[2048];
@@ -417,81 +417,102 @@ static sk_sp<SkData> patch_svg_data(const sk_sp<SkData>& data) {
                 in.c_str(), stdDev.c_str(), dx.c_str(), dy.c_str(), floodColor.c_str(), floodOpacity.c_str(), in.c_str());
             
             result.append(buf);
-            searchStart = m.suffix().first;
+            searchRange = searchRange.substr(m.get<0>().end() - searchRange.begin());
         }
-        if (changed) {
-            result.append(searchStart, svg.cend());
-            svg = result;
+        if (step_changed) {
+            result.append(searchRange);
+            patched_svg = std::move(result);
+            svg = patched_svg;
         }
     }
 
     // 2. Patch pattern containing linearGradient (Satori workaround)
     {
-        // More robust pattern matching that doesn't rely on specific attribute order
-        std::regex pat_re("<pattern\\s+([^>]*?id=\"([^\"]+)\"[^>]*?)>(.*?)</pattern>");
-        std::smatch m;
         std::string result;
-        std::string::const_iterator searchStart(svg.cbegin());
+        std::string_view searchRange = svg;
         bool patternChanged = false;
 
-        while (std::regex_search(searchStart, svg.cend(), m, pat_re)) {
-            std::string patternAttrs = m[1].str();
-            std::string patternId = m[2].str();
-            std::string content = m[3].str();
+        std::vector<std::pair<std::string, std::string>> replacements;
 
-            if (patternAttrs.find("patternUnits=\"objectBoundingBox\"") != std::string::npos) {
-                std::regex grad_re("<linearGradient\\s+([^>]*?id=\"([^\"]+)\"[^>]*?)>(.*?)</linearGradient>");
-                std::smatch gm;
-                if (std::regex_search(content.cbegin(), content.cend(), gm, grad_re)) {
+        while (auto m = ctre::search<"<pattern\\s+([^>]*?id=\"([^\"]+)\"[^>]*?)>(.*?)</pattern>">(searchRange)) {
+            std::string_view patternAttrs = m.get<1>().to_view();
+            std::string_view patternId = m.get<2>().to_view();
+            std::string_view content = m.get<3>().to_view();
+
+            if (patternAttrs.find("patternUnits=\"objectBoundingBox\"") != std::string_view::npos) {
+                if (auto gm = ctre::search<"<linearGradient\\s+([^>]*?id=\"([^\"]+)\"[^>]*?)>(.*?)</linearGradient>">(content)) {
                     patternChanged = true;
                     changed = true;
-                    result.append(searchStart, m[0].first);
+                    result.append(searchRange.substr(0, m.get<0>().begin() - searchRange.begin()));
 
-                    std::string gradAttrsWithId = gm[1].str();
-                    std::string gradId = gm[2].str();
-                    std::string gradContent = gm[3].str();
+                    std::string_view gradAttrsWithId = gm.get<1>().to_view();
+                    std::string_view gradId = gm.get<2>().to_view();
+                    std::string_view gradContent = gm.get<3>().to_view();
 
                     // Extract attributes without the ID to avoid duplicates
-                    std::string gradAttrs = std::regex_replace(gradAttrsWithId, std::regex("id=\"[^\"]+\""), "");
+                    std::string gradAttrs;
+                    std::string_view gaRange = gradAttrsWithId;
+                    while (auto gam = ctre::search<"id=\"[^\"]+\"">(gaRange)) {
+                        gradAttrs.append(gaRange.substr(0, gam.get<0>().begin() - gaRange.begin()));
+                        gaRange = gaRange.substr(gam.get<0>().end() - gaRange.begin());
+                    }
+                    gradAttrs.append(gaRange);
 
                     // Put the linearGradient in place of the pattern
                     result.append("<linearGradient id=\"");
-                    result.append(gradId);
+                    result.append(std::string(gradId));
                     result.append("\" ");
                     result.append(gradAttrs);
                     result.append(">");
-                    result.append(gradContent);
+                    result.append(std::string(gradContent));
                     result.append("</linearGradient>");
 
                     // Replace all references to this pattern with references to the nested gradient
-                    std::string ref = "url(#" + patternId + ")";
-                    std::string rep = "url(#" + gradId + ")";
-                    size_t pos = 0;
-                    while ((pos = svg.find(ref, pos)) != std::string::npos) {
-                        svg.replace(pos, ref.length(), rep);
-                        pos += rep.length();
-                    }
-                    searchStart = m.suffix().first;
+                    replacements.push_back({"url(#" + std::string(patternId) + ")", "url(#" + std::string(gradId) + ")"});
+                    
+                    searchRange = searchRange.substr(m.get<0>().end() - searchRange.begin());
                     continue;
                 }
             }
-            result.append(searchStart, m.suffix().first);
-            searchStart = m.suffix().first;
+            result.append(searchRange.substr(0, m.get<0>().end() - searchRange.begin()));
+            searchRange = searchRange.substr(m.get<0>().end() - searchRange.begin());
         }
 
         if (patternChanged) {
-            result.append(searchStart, svg.cend());
-            svg = result;
+            result.append(searchRange);
+            patched_svg = std::move(result);
+            
+            // Apply reference replacements on the full patched string
+            for (const auto& r : replacements) {
+                size_t pos = 0;
+                while ((pos = patched_svg.find(r.first, pos)) != std::string::npos) {
+                    patched_svg.replace(pos, r.first.length(), r.second);
+                    pos += r.second.length();
+                }
+            }
+            svg = patched_svg;
         }
     }
 
     // 3. Patch href to xlink:href for embedded images and add xlink namespace if needed
     {
-        std::regex re("(<image[^>]*?)\\s+href=\"data:([^/]+/[^;]+;base64,[^\"]+)\"");
-        std::string result = std::regex_replace(svg, re, "$1 xlink:href=\"data:$2\"");
-        if (result != svg) {
-            svg = result;
+        std::string result;
+        std::string_view searchRange = svg;
+        bool step_changed = false;
+        while (auto m = ctre::search<"(<image[^>]*?)\\s+href=\"data:([^/]+/[^;]+;base64,[^\"]+)\"">(searchRange)) {
+            step_changed = true;
             changed = true;
+            result.append(searchRange.substr(0, m.get<0>().begin() - searchRange.begin()));
+            result.append(m.get<1>().to_view());
+            result.append(" xlink:href=\"data:");
+            result.append(m.get<2>().to_view());
+            result.append("\"");
+            searchRange = searchRange.substr(m.get<0>().end() - searchRange.begin());
+        }
+        if (step_changed) {
+            result.append(searchRange);
+            patched_svg = std::move(result);
+            svg = patched_svg;
             
             // Ensure xmlns:xlink is present
             if (svg.find("xmlns:xlink") == std::string::npos) {
@@ -499,7 +520,8 @@ static sk_sp<SkData> patch_svg_data(const sk_sp<SkData>& data) {
                 if (pos != std::string::npos) {
                     size_t end_pos = svg.find(">", pos);
                     if (end_pos != std::string::npos) {
-                        svg.insert(end_pos, " xmlns:xlink=\"http://www.w3.org/1999/xlink\"");
+                        patched_svg.insert(end_pos, " xmlns:xlink=\"http://www.w3.org/1999/xlink\"");
+                        svg = patched_svg;
                     }
                 }
             }
@@ -507,7 +529,7 @@ static sk_sp<SkData> patch_svg_data(const sk_sp<SkData>& data) {
     }
 
     if (!changed) return data;
-    return SkData::MakeWithCopy(svg.c_str(), svg.size());
+    return SkData::MakeWithCopy(svg.data(), svg.size());
 }
 
 const uint8_t* api_load_image(ImageConverterInstance* inst, const uint8_t* data, size_t size) {

@@ -125,6 +125,7 @@ find_package(PNG REQUIRED)
 find_package(JPEG REQUIRED)
 find_package(WebP REQUIRED)
 find_package(EXPAT REQUIRED)
+find_package(ctre REQUIRED)
 
 set(IMAGE_CONVERTER_LIBS
     PNG::PNG
@@ -135,6 +136,7 @@ set(IMAGE_CONVERTER_LIBS
     WebP::libwebpmux
     WebP::sharpyuv
     EXPAT::EXPAT
+    ctre::ctre
     aom
     avif
     ZLIB::ZLIB
