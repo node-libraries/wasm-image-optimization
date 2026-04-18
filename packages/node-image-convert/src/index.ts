@@ -32,6 +32,25 @@ const main = async () => {
           }
         });
       }
+      
+      // New Crop test case
+      const cropLabel = `[${file}] -> [crop]`;
+      console.time(cropLabel);
+      await optimizeImage({
+        image,
+        crop: { x: 50, y: 50, width: 256, height: 256 },
+        width: 128,
+        format: "webp",
+      }).then(({ data }) => {
+        if (data) {
+          console.timeLog(
+            cropLabel,
+            `${Math.ceil(data.length / 1024).toLocaleString()}KB`,
+          );
+          const fileName = file.split(".")[0];
+          fs.writeFile(`image_output/${fileName}_crop.webp`, data);
+        }
+      });
     });
   }
   console.timeEnd(title);

@@ -1,6 +1,6 @@
 {
   "name": "wasm-image-optimization",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "description": "Optimize images with wasm on edge runtime",
   "type": "module",
   "main": "./dist/index.js",
