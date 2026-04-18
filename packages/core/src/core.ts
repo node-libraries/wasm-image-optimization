@@ -17,6 +17,7 @@ export interface ImageConverterModule {
     speed: number,
     animation: boolean,
   ) => Uint8Array | null;
+  crop: (inst: any, x: number, y: number, width: number, height: number) => boolean;
   resize: (inst: any, width: number, height: number, fit: number) => boolean;
   get_original_width: (inst: any) => number;
   get_original_height: (inst: any) => number;
@@ -51,6 +52,7 @@ export enum FitMode {
 
 export type OptimizeParams = {
   image: Uint8Array | ArrayBuffer | string;
+  crop?: { x: number; y: number; width: number; height: number };
   width?: number;
   height?: number;
   fit?: "contain" | "cover" | "fill";
@@ -198,6 +200,7 @@ export abstract class ImageConverterBase {
       quality,
       speed = 6,
       animation = false,
+      crop,
     } = params;
     const image =
       imageInput instanceof Uint8Array
@@ -218,6 +221,10 @@ export abstract class ImageConverterBase {
       let targetFormat = format || "webp";
       if (targetFormat !== "none" && animation && originalAnimation) {
         targetFormat = "webp";
+      }
+
+      if (crop) {
+        mod.crop(inst, crop.x, crop.y, crop.width, crop.height);
       }
 
       if (targetFormat !== "none" && (width || height)) {

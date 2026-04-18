@@ -51,6 +51,9 @@ wasm-image-optimization input.gif -f webp -a
 # Specify encoding speed (e.g., for AVIF)
 wasm-image-optimization input.png -f avif -s 0
 
+# Crop and resize
+wasm-image-optimization input.png --crop 10,10,200,200 -w 100
+
 # Resize and save with a different name
 wasm-image-optimization input.png -w 800 -h 600 -o resized.webp
 ```
@@ -67,6 +70,7 @@ const inputBuffer = ...; // Uint8Array or ArrayBuffer
 
 const result = await optimizeImage({
   image: inputBuffer,
+  crop: { x: 0, y: 0, width: 400, height: 400 }, // specify crop region
   width: 800,
   height: 600,
   fit: 'contain', // 'contain' | 'cover' | 'fill' (default: 'contain')
@@ -82,6 +86,7 @@ const result = await optimizeImage({
 | Parameter       | Type                               | Default      | Description                                                                                                                                                                      |
 | :-------------- | :--------------------------------- | :----------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`image`**     | `Uint8Array`<br>`ArrayBuffer`      | **Required** | The raw binary data of the image to process.                                                                                                                                     |
+| **`crop`**      | `{ x: number, y: number, width: number, height: number }` | - | Rectangular region to crop before resizing. Values are in pixels relative to the original image.                                                                               |
 | **`width`**     | `number`                           | -            | Target width for resizing. If omitted, it's calculated from `height` to maintain aspect ratio.                                                                                   |
 | **`height`**    | `number`                           | -            | Target height for resizing. If omitted, it's calculated from `width` to maintain aspect ratio.                                                                                   |
 | **`fit`**       | `contain` <br> `cover` <br> `fill` | `'contain'`  | Resizing strategy. <br> - `contain`: Fits within bounds (aspect ratio preserved). <br> - `cover`: Fills bounds (may crop). <br> - `fill`: Stretches to match bounds exactly.     |

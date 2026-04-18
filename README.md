@@ -11,6 +11,7 @@ https://node-libraries.github.io/wasm-image-optimization/
 
 - **Multi-format Support**: Supports major raster formats and SVG loading.
 - **Animation Support**: Supports loading GIF and WebP animations. Animated WebP is recommended for output.
+- **Cropping**: Supports cropping to a specified rectangular region before resizing.
 - **High-Quality Resizing**: Supports `fit` options (`contain`, `cover`, `fill`) with aspect ratio preservation.
 - **Intelligent Animation Conversion**: Automatically switches the output format to `webp` if animations are enabled and the source is animated.
 - **Fast Execution**: High-speed image processing using C++20 and SIMD (`msimd128`).
@@ -57,6 +58,9 @@ wasm-image-optimization input.gif -f webp -a
 # Specify encoding speed (e.g., for AVIF)
 wasm-image-optimization input.png -f avif -s 0
 
+# Crop and resize
+wasm-image-optimization input.png --crop 10,10,200,200 -w 100
+
 # Resize and save with a different name
 wasm-image-optimization input.png -w 800 -h 600 -o resized.webp
 ```
@@ -73,6 +77,7 @@ const inputBuffer = ...; // Uint8Array or ArrayBuffer
 
 const result = await optimizeImage({
   image: inputBuffer,
+  crop: { x: 0, y: 0, width: 400, height: 400 }, // specify crop region
   width: 800,
   height: 600,
   fit: 'contain', // 'contain' | 'cover' | 'fill' (default: 'contain')

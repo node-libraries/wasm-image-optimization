@@ -28,6 +28,13 @@ program
     6,
   )
   .option("-a, --animation", "maintain animation frames", false)
+  .option("--crop <x,y,w,h>", "crop region (format: x,y,width,height)", (val) => {
+    const parts = val.split(",").map(Number);
+    if (parts.length !== 4 || parts.some(isNaN)) {
+      throw new Error("Invalid crop format. Use x,y,width,height");
+    }
+    return { x: parts[0], y: parts[1], width: parts[2], height: parts[3] };
+  })
   .action(async (input, options) => {
     try {
       const inputData = await fs.readFile(input);
@@ -37,6 +44,7 @@ program
 
       const result = await converter.optimizeImage({
         image: inputData,
+        crop: options.crop,
         width: options.width,
         height: options.height,
         format: options.format as any,

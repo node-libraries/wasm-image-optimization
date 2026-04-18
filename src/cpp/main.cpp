@@ -60,6 +60,11 @@ static val encode_val(ImageConverterInstance* inst, int format, float quality, i
     return val(typed_memory_view(size, data));
 }
 
+static bool crop_val(ImageConverterInstance* inst, int x, int y, int width, int height) {
+    if (!inst) return false;
+    return api_crop(inst, x, y, width, height);
+}
+
 static bool resize_val(ImageConverterInstance* inst, int width, int height, int fit) {
     if (!inst) return false;
     return api_resize(inst, width, height, fit);
@@ -72,6 +77,7 @@ EMSCRIPTEN_BINDINGS(image_converter) {
     function("destroy_instance", &destroy_instance, allow_raw_pointers());
     function("load_image", &load_image_val, allow_raw_pointers());
     function("encode", &encode_val, allow_raw_pointers());
+    function("crop", &crop_val, allow_raw_pointers());
     function("resize", &resize_val, allow_raw_pointers());
     function("get_original_width", &api_get_original_width, allow_raw_pointers());
     function("get_original_height", &api_get_original_height, allow_raw_pointers());

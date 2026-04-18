@@ -33,6 +33,7 @@ class ImageConverterInstance {
 
     bool load_image(const uint8_t* data, size_t size);
     const uint8_t* encode(RenderFormat format, float quality, int speed, bool animation, int& out_size);
+    bool crop(int x, int y, int width, int height);
     bool resize(int width, int height, FitMode fit = FitMode::Contain);
 
     int get_original_width() const;
@@ -50,6 +51,7 @@ void api_destroy_instance(ImageConverterInstance* inst);
 
 const uint8_t* api_load_image(ImageConverterInstance* inst, const uint8_t* data, size_t size);
 const uint8_t* api_encode(ImageConverterInstance* inst, int format, float quality, int speed, bool animation, int& out_size);
+bool api_crop(ImageConverterInstance* inst, int x, int y, int width, int height);
 bool api_resize(ImageConverterInstance* inst, int width, int height, int fit = 0);
 
 int api_get_original_width(ImageConverterInstance* inst);

@@ -308,6 +308,36 @@ const uint8_t* ImageConverterInstance::encode(RenderFormat format, float quality
     return nullptr;
 }
 
+bool ImageConverterInstance::crop(int x, int y, int width, int height) {
+    if (frames.empty()) return false;
+
+    int original_w = frames[0].bitmap.width();
+    int original_h = frames[0].bitmap.height();
+
+    if (x < 0) x = 0;
+    if (y < 0) y = 0;
+    if (x + width > original_w) width = original_w - x;
+    if (y + height > original_h) height = original_h - y;
+
+    if (width <= 0 || height <= 0) return false;
+
+    for (auto& frame : frames) {
+        SkImageInfo info = frame.bitmap.info().makeWH(width, height);
+        SkBitmap cropped;
+        cropped.allocPixels(info);
+
+        SkCanvas canvas(cropped);
+        canvas.clear(SK_ColorTRANSPARENT);
+
+        SkRect src_rect = SkRect::MakeXYWH((float)x, (float)y, (float)width, (float)height);
+        SkRect dest_rect = SkRect::MakeWH((float)width, (float)height);
+        canvas.drawImageRect(frame.bitmap.asImage(), src_rect, dest_rect, SkSamplingOptions(), nullptr, SkCanvas::kStrict_SrcRectConstraint);
+
+        frame.bitmap = cropped;
+    }
+    return true;
+}
+
 bool ImageConverterInstance::resize(int width, int height, FitMode fit) {
     if (frames.empty()) return false;
 
@@ -546,6 +576,10 @@ const uint8_t* api_load_image(ImageConverterInstance* inst, const uint8_t* data,
 
 const uint8_t* api_encode(ImageConverterInstance* inst, int format, float quality, int speed, bool animation, int& out_size) {
     return inst->encode((RenderFormat)format, quality, speed, animation, out_size);
+}
+
+bool api_crop(ImageConverterInstance* inst, int x, int y, int width, int height) {
+    return inst->crop(x, y, width, height);
 }
 
 bool api_resize(ImageConverterInstance* inst, int width, int height, int fit) {
