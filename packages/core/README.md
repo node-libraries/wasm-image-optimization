@@ -5,6 +5,10 @@ Built on the Skia rendering engine, it supports animations (GIF/WebP) and modern
 
 It provides a lightweight, dependency-free solution for generating high-quality visuals and documents across **Node.js**, **Cloudflare Workers**, **Deno**, and **Web Browsers**.
 
+> [!TIP]
+> If you need to generate image files from HTML/CSS, please use the [satoru-render](https://www.npmjs.com/package/satoru-render) library.
+
+
 ## Playground
 
 https://node-libraries.github.io/wasm-image-optimization/
@@ -83,17 +87,17 @@ const result = await optimizeImage({
 
 ### Parameters (`OptimizeParams`)
 
-| Parameter       | Type                               | Default      | Description                                                                                                                                                                      |
-| :-------------- | :--------------------------------- | :----------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`image`**     | `Uint8Array`<br>`ArrayBuffer`      | **Required** | The raw binary data of the image to process.                                                                                                                                     |
-| **`crop`**      | `{ x: number, y: number, width: number, height: number }` | - | Rectangular region to crop before resizing. Values are in pixels relative to the original image.                                                                               |
-| **`width`**     | `number`                           | -            | Target width for resizing. If omitted, it's calculated from `height` to maintain aspect ratio.                                                                                   |
-| **`height`**    | `number`                           | -            | Target height for resizing. If omitted, it's calculated from `width` to maintain aspect ratio.                                                                                   |
-| **`fit`**       | `contain` <br> `cover` <br> `fill` | `'contain'`  | Resizing strategy. <br> - `contain`: Fits within bounds (aspect ratio preserved). <br> - `cover`: Fills bounds (may crop). <br> - `fill`: Stretches to match bounds exactly.     |
-| **`format`**    | `string`                           | `'webp'`     | Output format: `'none'`, `'png'`, `'webp'`, `'jpeg'`, `'avif'`, `'raw'`, `'thumbhash'`. <br> _Note: If `animation: true` and the input is animated, this is forced to `'webp'`._ |
-| **`quality`**   | `number`                           | `100`        | Compression quality (0-100). Applies to WebP, JPEG, and AVIF.                                                                                                                    |
-| **`speed`**     | `number`                           | `6`          | Encoding speed (0-10). Primarily used for AVIF. Lower is slower but better compression.                                                                                          |
-| **`animation`** | `boolean`                          | `false`      | If `true`, preserves animation frames (e.g., GIF/animated WebP source).                                                                                                          |
+| Parameter       | Type                                                      | Default      | Description                                                                                                                                                                      |
+| :-------------- | :-------------------------------------------------------- | :----------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`image`**     | `Uint8Array`<br>`ArrayBuffer`                             | **Required** | The raw binary data of the image to process.                                                                                                                                     |
+| **`crop`**      | `{ x: number, y: number, width: number, height: number }` | -            | Rectangular region to crop before resizing. Values are in pixels relative to the original image.                                                                                 |
+| **`width`**     | `number`                                                  | -            | Target width for resizing. If omitted, it's calculated from `height` to maintain aspect ratio.                                                                                   |
+| **`height`**    | `number`                                                  | -            | Target height for resizing. If omitted, it's calculated from `width` to maintain aspect ratio.                                                                                   |
+| **`fit`**       | `contain` <br> `cover` <br> `fill`                        | `'contain'`  | Resizing strategy. <br> - `contain`: Fits within bounds (aspect ratio preserved). <br> - `cover`: Fills bounds (may crop). <br> - `fill`: Stretches to match bounds exactly.     |
+| **`format`**    | `string`                                                  | `'webp'`     | Output format: `'none'`, `'png'`, `'webp'`, `'jpeg'`, `'avif'`, `'raw'`, `'thumbhash'`. <br> _Note: If `animation: true` and the input is animated, this is forced to `'webp'`._ |
+| **`quality`**   | `number`                                                  | `100`        | Compression quality (0-100). Applies to WebP, JPEG, and AVIF.                                                                                                                    |
+| **`speed`**     | `number`                                                  | `6`          | Encoding speed (0-10). Primarily used for AVIF. Lower is slower but better compression.                                                                                          |
+| **`animation`** | `boolean`                                                 | `false`      | If `true`, preserves animation frames (e.g., GIF/animated WebP source).                                                                                                          |
 
 ### Result (`OptimizeResult`)
 

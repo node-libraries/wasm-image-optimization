@@ -3,6 +3,9 @@
 High-performance image conversion and resizing tool leveraging WebAssembly (Emscripten).
 Built on the Skia rendering engine, it supports animations (GIF/WebP) and modern formats (AVIF/SVG/ThumbHash).
 
+> [!TIP]
+> If you need to generate image files from HTML/CSS, please use the [satoru-render](https://www.npmjs.com/package/satoru-render) library.
+
 ## Playground
 
 https://node-libraries.github.io/wasm-image-optimization/
