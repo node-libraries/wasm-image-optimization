@@ -1,7 +1,8 @@
 #include <stdint.h>
+
 #include "include/core/SkPath.h"
 #include "include/core/SkRect.h"
-#include "include/private/base/SkSemaphore.h"
+#include "include/private/SkSemaphore.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
@@ -76,6 +77,6 @@ void _ZN18SkShaderMaskFilter20RegisterFlattenablesEv() {}
 void _ZN20SkDiscretePathEffect20RegisterFlattenablesEv() {}
 void _ZN8SkTrimPE10CreateProcER12SkReadBuffer() {}
 
-} // extern "C"
+}  // extern "C"
 
 #pragma clang diagnostic pop

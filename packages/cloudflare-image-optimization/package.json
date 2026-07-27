@@ -9,18 +9,18 @@
     "lint:fix": "eslint --fix src && prettier -w src"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260307.1",
+    "@cloudflare/workers-types": "^5.20260727.1",
     "@eslint/js": "10.0.1",
-    "@typescript-eslint/eslint-plugin": "^8.56.1",
-    "@typescript-eslint/parser": "^8.56.1",
-    "eslint": "10.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.65.0",
+    "@typescript-eslint/parser": "^8.65.0",
+    "eslint": "10.8.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-import": "^2.32.0",
-    "prettier": "^3.8.1",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.56.1",
-    "wrangler": "^4.71.0"
+    "prettier": "^3.9.6",
+    "typescript": "^7.0.2",
+    "typescript-eslint": "^8.65.0",
+    "wrangler": "^4.114.0"
   },
   "dependencies": {
     "wasm-image-optimization": "workspace:*"

@@ -11,6 +11,9 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_BASE_PATH: basePath,
   },
+  experimental: {
+    useTypeScriptCli: true,
+  },
 };
 
 export default nextConfig;
