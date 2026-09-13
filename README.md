@@ -121,15 +121,20 @@ const result = await optimizeImage({
 ### Cloudflare Workers
 
 Use the specialized `workerd` entry point for edge runtimes.
+Since Cloudflare Workers has strict memory limits (e.g., 128MB), using a semaphore such as [`@node-libraries/semaphore`](https://www.npmjs.com/package/@node-libraries/semaphore) to limit concurrent image optimization tasks is recommended to prevent Out-of-Memory (OOM) errors.
 
 ```typescript
+import { semaphore } from "@node-libraries/semaphore";
 import { optimizeImage } from "wasm-image-optimization/workerd";
 
+const sem = semaphore(2);
+
+await sem.acquire();
 const result = await optimizeImage({
   image: inputBuffer,
   width: 800,
   format: "avif",
-});
+}).finally(() => sem.release());
 ```
 
 ## Build

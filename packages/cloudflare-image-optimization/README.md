@@ -99,6 +99,24 @@ export default {
 };
 ```
 
+## Concurrency Limit
+
+Cloudflare Workers has strict memory limits (e.g., 128MB). Concurrent execution of heavy WebAssembly image optimization tasks may lead to Out of Memory (OOM) errors.
+Using `@node-libraries/semaphore`, you can limit the maximum number of concurrent image conversion tasks (`optimizeImage`) while still allowing lightweight requests (such as cache hits, image downloads, or SVGs) to be processed without blocking.
+
+```ts
+import { semaphore } from '@node-libraries/semaphore';
+
+// Limit maximum concurrent conversions to 2
+const sem = semaphore(2);
+
+// Within request handler:
+await sem.acquire();
+const { data } = await optimizeImage({
+	// ...
+}).finally(() => sem.release());
+```
+
 ## Deploy
 
 ```sh
