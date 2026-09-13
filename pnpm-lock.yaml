@@ -26,6 +26,9 @@ importers:
 
   packages/cloudflare-image-optimization:
     dependencies:
+      '@node-libraries/semaphore':
+        specifier: ^1.0.3
+        version: 1.0.3
       wasm-image-optimization:
         specifier: workspace:*
         version: link:../core
@@ -69,6 +72,9 @@ importers:
 
   packages/cloudflare-ogp:
     dependencies:
+      '@node-libraries/semaphore':
+        specifier: ^1.0.3
+        version: 1.0.3
       react:
         specifier: ^19.2.8
         version: 19.2.8
@@ -849,6 +855,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@node-libraries/semaphore@1.0.3':
+    resolution: {integrity: sha512-rHAzAaVa8hvJFmy9F9Y0sCZeIpaoSodCUXG/p1Fmui6qdsTXnJ5o0pjHec247bOhcF0dozYXERVOLo1TQ6XUIQ==}
+
   '@oxc-project/types@0.147.0':
     resolution: {integrity: sha512-IJ3s6ltHLp45S0bh7phkX+gJO7A1Wuz2EaqpAhb8WjqDwbzMiWKHhyyT42tskaWjEYXtHtVCPpnBJVT9+dcRLg==}
 
@@ -1093,9 +1102,6 @@ packages:
 
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
-
-  '@types/node@26.1.1':
-    resolution: {integrity: sha512-nxAkRSVkN1Y0JC1W8ky/fTfkGsMmcrRsbx+3XoZE+rMOX71kLYTV7fLXpqud1GpbpP5TuffXFqfX7fH2GgZREw==}
 
   '@types/node@26.4.0':
     resolution: {integrity: sha512-faiGnoIrLH/V8cibOMEAZ8pMw6oXqSukl29ra4mN8GdaB2ZewzeaLj+INpV5N+Z1eKWzY+IzaIZH2EIR6YZRNQ==}
@@ -3662,6 +3668,8 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.3.4':
     optional: true
 
+  '@node-libraries/semaphore@1.0.3': {}
+
   '@oxc-project/types@0.147.0': {}
 
   '@poppinss/colors@4.1.6':
@@ -3831,10 +3839,6 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
-
-  '@types/node@26.1.1':
-    dependencies:
-      undici-types: 8.3.0
 
   '@types/node@26.4.0':
     dependencies:
@@ -5061,7 +5065,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 26.1.1
+      '@types/node': 26.4.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
 

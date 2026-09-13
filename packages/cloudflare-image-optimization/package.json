@@ -1,32 +1,33 @@
 {
-  "name": "cloudflare-workers-image-optimization",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "deploy": "wrangler deploy",
-    "dev": "wrangler dev",
-    "lint": "eslint src",
-    "lint:fix": "eslint --fix src && prettier -w src"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260901.1",
-    "@eslint/js": "10.0.1",
-    "@typescript-eslint/eslint-plugin": "^8.69.0",
-    "@typescript-eslint/parser": "^8.69.0",
-    "eslint": "10.9.1",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-typescript": "^4.4.5",
-    "eslint-plugin-import": "^2.32.0",
-    "prettier": "^3.9.6",
-    "typescript": "^7.0.2",
-    "typescript-eslint": "^8.69.0",
-    "wrangler": "^4.127.1"
-  },
-  "dependencies": {
-    "wasm-image-optimization": "workspace:*"
-  },
-  "main": "index.js",
-  "repository": "https://github.com/SoraKumo001/cloudflare-workers-image-optimization",
-  "author": "SoraKumo <info@croud.jp>",
-  "license": "MIT"
+	"name": "cloudflare-workers-image-optimization",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"deploy": "wrangler deploy",
+		"dev": "wrangler dev",
+		"lint": "eslint src",
+		"lint:fix": "eslint --fix src && prettier -w src"
+	},
+	"devDependencies": {
+		"@cloudflare/workers-types": "^5.20260901.1",
+		"@eslint/js": "10.0.1",
+		"@typescript-eslint/eslint-plugin": "^8.69.0",
+		"@typescript-eslint/parser": "^8.69.0",
+		"eslint": "10.9.1",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-import-resolver-typescript": "^4.4.5",
+		"eslint-plugin-import": "^2.32.0",
+		"prettier": "^3.9.6",
+		"typescript": "^7.0.2",
+		"typescript-eslint": "^8.69.0",
+		"wrangler": "^4.127.1"
+	},
+	"dependencies": {
+		"@node-libraries/semaphore": "^1.0.3",
+		"wasm-image-optimization": "workspace:*"
+	},
+	"main": "index.js",
+	"repository": "https://github.com/SoraKumo001/cloudflare-workers-image-optimization",
+	"author": "SoraKumo <info@croud.jp>",
+	"license": "MIT"
 }

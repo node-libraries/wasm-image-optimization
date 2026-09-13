@@ -3,7 +3,10 @@
 Deploy the following code to Cloudflare Workers to receive requests for next/image in Next.js
 
 ```ts
+import { semaphore } from '@node-libraries/semaphore';
 import { optimizeImage } from 'wasm-image-optimization';
+
+const sem = semaphore(2);
 
 const isValidUrl = (url: string) => {
 	try {
@@ -71,13 +74,14 @@ const handleRequest = async (request: Request, _env: object, ctx: ExecutionConte
 	}
 
 	const format = type ?? (isAvif ? 'avif' : isWebp ? 'webp' : contentType === 'image/jpeg' ? 'jpeg' : 'png');
+	await sem.acquire();
 	const { data } = await optimizeImage({
 		image: srcImage,
 		width: width ? Number(width) : undefined,
 		quality: quality ? Number(quality) : undefined,
 		format,
 		speed: 9,
-	});
+	}).finally(() => sem.release());
 
 	const response = new Response(data, {
 		headers: {
