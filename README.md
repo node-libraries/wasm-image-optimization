@@ -4,7 +4,7 @@ High-performance image conversion and resizing tool leveraging WebAssembly (Emsc
 Built on the Skia rendering engine, it supports animations (GIF/WebP) and modern formats (AVIF/SVG/ThumbHash).
 
 > [!TIP]
-> If you need to generate image files from HTML/CSS, please use the [satoru-render](https://www.npmjs.com/package/satoru-render) library.
+> If you need HTML rendering or support for modern formats such as JPEG XL (JXL), check out [wasm-html-to-image](https://www.npmjs.com/package/wasm-html-to-image). It extends image optimization with HTML/CSS rendering capabilities and additional format support in a single package.
 
 ## Playground
 
