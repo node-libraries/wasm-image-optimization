@@ -269,7 +269,7 @@ target_include_directories(skia_lib PUBLIC
     "${skia_SOURCE_DIR}/modules/svg/include"
     "${skia_SOURCE_DIR}/modules/skresources/include"
 )
-target_compile_definitions(skia_lib PUBLIC SK_USER_CONFIG_HEADER="SkUserConfig.h" SK_ENABLE_SVG SK_DISABLE_FILESYSTEM SKCMS_PORTABLE)
+target_compile_definitions(skia_lib PUBLIC SK_USER_CONFIG_HEADER="SkUserConfig.h" SK_ENABLE_SVG SK_DISABLE_FILESYSTEM SKCMS_PORTABLE SK_CODEC_DECODES_PNG_WITH_LIBPNG)
 target_compile_options(skia_lib PRIVATE ${COMMON_COMPILE_OPTIONS} -w)
 target_link_libraries(skia_lib PUBLIC ${IMAGE_CONVERTER_LIBS})
 
